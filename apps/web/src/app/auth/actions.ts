@@ -18,7 +18,7 @@ export async function login(form: FormData) {
     redirect(`/login?error=${encodeURIComponent("Informe e-mail e senha.")}&next=${encodeURIComponent(next)}`);
   }
 
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
@@ -41,7 +41,7 @@ export async function login(form: FormData) {
 }
 
 export async function logout() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");

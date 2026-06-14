@@ -49,7 +49,7 @@ export const roleLabels: Record<UserRole, string> = {
 };
 
 export async function getSessionProfile(): Promise<SessionProfile | null> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const {
     data: { user }
   } = await supabase.auth.getUser();

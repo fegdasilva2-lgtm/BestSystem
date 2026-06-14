@@ -2,7 +2,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { createSite } from "../actions";
 
 export default async function NewSitePage() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const [{ data: customers }, { data: contracts }] = await Promise.all([
     supabase.from("customers").select("id, name").order("name"),
     supabase.from("contracts").select("id, code, customer_id").order("code")
@@ -18,7 +18,7 @@ export default async function NewSitePage() {
 
       <form action={async (formData) => {
         "use server";
-        return await createSite(formData);
+        await createSite(formData);
       }} className="form-card">
         <label className="field">
           <span>Cliente *</span>

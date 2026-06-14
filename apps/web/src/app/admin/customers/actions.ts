@@ -12,7 +12,7 @@ export interface CreateCustomerResult {
 }
 
 export async function createCustomer(form: FormData): Promise<CreateCustomerResult> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
 

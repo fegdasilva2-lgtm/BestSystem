@@ -1,8 +1,8 @@
-// Edge middleware: protege rotas privadas usando a sessao Supabase.
+// Proxy Next.js: protege rotas privadas usando a sessao Supabase.
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",

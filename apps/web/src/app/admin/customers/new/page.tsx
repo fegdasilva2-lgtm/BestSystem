@@ -12,12 +12,7 @@ export default function NewCustomerPage() {
       <form
         action={async (formData) => {
           "use server";
-          const res = await createCustomer(formData);
-          if (res.error) {
-            return { error: res.error };
-          }
-          // redireciona apos sucesso
-          return { id: res.id };
+          await createCustomer(formData);
         }}
         className="form-card"
       >

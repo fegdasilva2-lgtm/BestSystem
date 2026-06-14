@@ -2,7 +2,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { createContract } from "../actions";
 
 export default async function NewContractPage() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { data: customers } = await supabase
     .from("customers")
     .select("id, name, document")
@@ -21,7 +21,7 @@ export default async function NewContractPage() {
       <form
         action={async (formData) => {
           "use server";
-          return await createContract(formData);
+          await createContract(formData);
         }}
         className="form-card"
       >

@@ -33,7 +33,7 @@ export default async function UsersPage({
     redirect("/login?error=Usuario sem perfil ativo&next=/admin/users");
   }
 
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { data: users, error } = await supabase
     .from("users_profile")
     .select("id, name, email, role, active, created_at")

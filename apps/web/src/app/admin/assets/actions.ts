@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export interface CreateAssetResult { id?: string; error?: string; }
 
 export async function createAsset(form: FormData): Promise<CreateAssetResult> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
 

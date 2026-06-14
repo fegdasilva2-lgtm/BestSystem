@@ -2,7 +2,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { createAsset } from "../actions";
 
 export default async function NewAssetPage() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const [{ data: sites }, { data: locations }] = await Promise.all([
     supabase.from("sites").select("id, name").order("name"),
     supabase.from("locations").select("id, name, site_id, type").order("name")
@@ -20,7 +20,7 @@ export default async function NewAssetPage() {
 
       <form action={async (formData) => {
         "use server";
-        return await createAsset(formData);
+        await createAsset(formData);
       }} className="form-card">
         <fieldset className="form-section">
           <legend>Identificacao</legend>

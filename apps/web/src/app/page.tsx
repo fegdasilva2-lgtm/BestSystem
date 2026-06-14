@@ -3,7 +3,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { data: tenants, error } = await supabase
     .from("tenants")
     .select("id, name, plan, status")
