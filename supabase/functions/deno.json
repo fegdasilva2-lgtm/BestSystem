@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "serve": "supabase functions serve --no-verify-jwt custom-access-token,rls-isolation-test",
+    "deploy": "supabase functions deploy --no-verify-jwt custom-access-token && supabase functions deploy --no-verify-jwt rls-isolation-test",
+    "test": "deno test --allow-net --allow-env supabase/functions/"
+  }
+}

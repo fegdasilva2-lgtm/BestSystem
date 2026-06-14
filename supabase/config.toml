@@ -1,0 +1,42 @@
+{
+  "project_id": "predialops-homolog",
+  "region": "sa-east-1",
+  "entrypoint": "./apps/mobile/index.html",
+  "auth": {
+    "site_url": "https://homolog.predialops.app.br",
+    "additional_redirect_urls": [
+      "https://homolog.predialops.app.br/portal",
+      "https://homolog.predialops.app.br/portal/solicitante"
+    ],
+    "jwt_expiry": 3600,
+    "enable_signup": false,
+    "enable_anonymous_sign_ins": false,
+    "mfa": {
+      "max_enrolled_factors": 5
+    }
+  },
+  "db": {
+    "pool_size": 15,
+    "shadow_pool_size": 5
+  },
+  "storage": {
+    "file_size_limit": "20MiB",
+    "image_transformation": { "enabled": false }
+  },
+  "realtime": {
+    "broadcast": { "self": false },
+    "presence": { "enabled": true },
+    "private_channels": true
+  },
+  "edge_functions": {
+    "verify_jwt": true
+  },
+  "auth": {
+    "hook": {
+      "custom_access_token": {
+        "uri": "pg-functions://postgres/public/custom_access_token_hook",
+        "enabled": true
+      }
+    }
+  }
+}

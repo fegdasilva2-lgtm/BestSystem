@@ -1,0 +1,15 @@
+{
+  "name": "PredialOps Facilities SaaS",
+  "short_name": "PredialOps",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f2ea",
+  "theme_color": "#18332f",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

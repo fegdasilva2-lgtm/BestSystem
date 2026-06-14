@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#18332f" />
+    <title>PredialOps | Facilities SaaS</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegacao principal">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">P</div>
+          <div>
+            <strong>PredialOps</strong>
+            <span>CMMS + Contract Ops</span>
+          </div>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="tenant-card" id="tenantCard">
+          <span>Tenant ativo</span>
+          <strong>IMC Facilities</strong>
+          <small>12 sites, 1.248 ativos</small>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Operacao Brasil · Maio/2026</p>
+            <h1 id="viewTitle">Central de Operacao</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="session-switcher" aria-label="Sessao ativa">
+              <label>
+                Perfil
+                <select id="userSelect"></select>
+              </label>
+              <label>
+                Tenant
+                <select id="tenantSelect"></select>
+              </label>
+            </div>
+            <button class="ghost-button" id="syncButton" type="button">Sincronizar</button>
+            <button class="primary-button" data-action="new-request" type="button">Novo chamado</button>
+          </div>
+        </header>
+
+        <section id="view" class="view" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <dialog id="requestDialog" class="dialog">
+      <form method="dialog" id="requestForm">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">Portal do solicitante</p>
+            <h2>Novo chamado</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Fechar">x</button>
+        </div>
+        <label>
+          Solicitante
+          <input name="requester" required value="Mariana Costa" />
+        </label>
+        <label>
+          Local
+          <select name="location">
+            <option>Shopping Norte / Torre A / Pavimento 3</option>
+            <option>Hospital Vida / Central de Agua Gelada</option>
+            <option>Condominio Axis / Subsolo 2</option>
+          </select>
+        </label>
+        <label>
+          Categoria
+          <select name="category">
+            <option>Ar-condicionado</option>
+            <option>Eletrica</option>
+            <option>Hidraulica</option>
+            <option>Civil</option>
+            <option>Limpeza tecnica</option>
+          </select>
+        </label>
+        <label>
+          Descricao
+          <textarea name="description" required>Equipamento com ruído anormal e baixa vazao.</textarea>
+        </label>
+        <div class="dialog-actions">
+          <button class="ghost-button" value="cancel" type="button" id="cancelRequest">Cancelar</button>
+          <button class="primary-button" value="default" type="submit">Abrir chamado</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

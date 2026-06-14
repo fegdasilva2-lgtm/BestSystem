@@ -1,0 +1,41 @@
+{
+  "version": "5",
+  "remote": {
+    "https://esm.sh/@supabase/supabase-js@2.45.0": "36ae57c3f2dc3f94fd122a846b40a87114d29bb2f47e910cb46bee5575febf2e"
+  },
+  "workspace": {
+    "members": {
+      "apps/mobile": {
+        "packageJson": {
+          "dependencies": [
+            "npm:dexie@^4.0.10",
+            "npm:workbox-build@^7.3.0"
+          ]
+        }
+      },
+      "apps/web": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@predialops/ds@*",
+            "npm:@supabase/ssr@0.5",
+            "npm:@supabase/supabase-js@^2.45.0",
+            "npm:@types/node@^20.16.5",
+            "npm:@types/react-dom@18.3.0",
+            "npm:@types/react@18.3.5",
+            "npm:next@14.2.13",
+            "npm:react-dom@18.3.1",
+            "npm:react@18.3.1",
+            "npm:typescript@^5.4.5"
+          ]
+        }
+      },
+      "packages/ds": {
+        "packageJson": {
+          "dependencies": [
+            "npm:typescript@^5.4.5"
+          ]
+        }
+      }
+    }
+  }
+}

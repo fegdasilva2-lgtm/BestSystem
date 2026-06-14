@@ -1,0 +1,39 @@
+{
+  "name": "predialops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PredialOps - plataforma SaaS brasileira de gestao de contratos de manutencao predial. Piloto em monorepo com PWA mobile, Next.js web, Supabase e design system compartilhado.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:mobile": "npm run dev --workspace=@predialops/mobile",
+    "dev:web": "npm run dev --workspace=@predialops/web",
+    "build:ds": "npm run build --workspace=@predialops/ds",
+    "check": "node apps/mobile/scripts/check-app.mjs",
+    "test:importer": "node tests/importer.test.mjs",
+    "test:schedule": "node tests/schedule.test.mjs",
+    "test:conflict": "node tests/sync-conflict.test.mjs",
+    "test:load": "node tests/load.test.mjs",
+    "test": "npm run test:importer && npm run test:schedule && npm run test:conflict && npm run test:load",
+    "db:types": "supabase gen types typescript --linked > packages/ds/src/db-types.ts",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "fn:typecheck": "deno check supabase/functions/custom-access-token/index.ts supabase/functions/rls-isolation-test/index.ts",
+    "fn:deploy": "supabase functions deploy --no-verify-jwt custom-access-token && supabase functions deploy --no-verify-jwt rls-isolation-test",
+    "fn:serve": "supabase functions serve --no-verify-jwt custom-access-token,rls-isolation-test",
+    "rls:test:sql": "psql \"$DATABASE_URL\" -f supabase/tests/rls-isolation.sql",
+    "rls:test:fn": "curl -X POST -H \"Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY\" $SUPABASE_URL/functions/v1/rls-isolation-test"
+  },
+  "keywords": [
+    "facilities",
+    "cmms",
+    "manutencao",
+    "pwa",
+    "saas",
+    "supabase",
+    "nextjs"
+  ],
+  "license": "UNLICENSED"
+}
