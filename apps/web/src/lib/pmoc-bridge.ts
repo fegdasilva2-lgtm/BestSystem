@@ -171,7 +171,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
 
   const normalized = (assetType ?? "").toLowerCase();
   if (!HVAC_TYPES.has(normalized)) {
-    throw new Error(`Tipo de ativo nao e HVAC: ${assetType}.`);
+    throw new Error(`Tipo de ativo não é HVAC: ${assetType}.`);
   }
   return [...base, ...(extras[normalized] ?? [])];
 }
@@ -190,7 +190,7 @@ export function gerarPmoc({
   if (!plan?.siteId) throw new Error("plan.siteId obrigatorio");
   if (!plan?.rtName || !plan?.rtCrea) throw new Error("RT (responsavel tecnico) obrigatorio");
   if (!plan?.artNumber) throw new Error("ART obrigatoria");
-  if (!plan?.startsOn || !plan?.endsOn) throw new Error("vigencia obrigatoria");
+  if (!plan?.startsOn || !plan?.endsOn) throw new Error("vigência obrigatória");
   if (plan.endsOn <= plan.startsOn) throw new Error("endsOn deve ser maior que startsOn");
 
   const activities: PmocActivityFull[] = [];

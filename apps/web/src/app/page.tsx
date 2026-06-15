@@ -68,7 +68,7 @@ export default async function HomePage() {
         <article className="glass-card">
           <p className="eyebrow">Segurança</p>
           <h2>Multi-tenant com RLS</h2>
-          <p className="muted">O isolamento nao depende apenas de filtros no frontend.</p>
+          <p className="muted">O isolamento não depende apenas de filtros no frontend.</p>
         </article>
         <article className="glass-card">
           <p className="eyebrow">Campo</p>

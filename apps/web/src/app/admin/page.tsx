@@ -40,8 +40,8 @@ export default function OnboardingHub() {
         <div>
           <p className="eyebrow">Operação mensal</p>
           <strong>
-            Apos o contrato entrar em producao, o RGM passa a ser o entregavel-chave para o cliente.
-            Configure blocos por contrato e arquive a versao imutavel apos o aceite.
+            Após o contrato entrar em produção, o RGM passa a ser o entregável-chave para o cliente.
+            Configure blocos por contrato e arquive a versão imutável após o aceite.
           </strong>
         </div>
         <a
