@@ -37,7 +37,7 @@ export const roleLabels: Record<UserRole, string> = {
   gestor_facilities: "Gestor de facilities",
   planejador: "Planejador",
   supervisor: "Supervisor",
-  tecnico: "Tecnico",
+  tecnico: "Técnico",
   auxiliar: "Auxiliar",
   almoxarife: "Almoxarife",
   comercial: "Comercial",
@@ -66,7 +66,7 @@ export async function getSessionProfile(): Promise<SessionProfile | null> {
     return {
       authUserId: user.id,
       email: user.email ?? "",
-      name: user.email ?? "Usuario sem perfil",
+      name: user.email ?? "Usuário sem perfil",
       role: "solicitante",
       active: false,
       tenant: null

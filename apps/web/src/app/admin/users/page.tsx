@@ -37,7 +37,7 @@ export default async function UsersPage({
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    redirect("/login?error=Usuario sem perfil ativo&next=/admin/users");
+    redirect("/login?error=Usuário sem perfil ativo&next=/admin/users");
   }
 
   const supabase = await createSupabaseServer();

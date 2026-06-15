@@ -78,7 +78,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     },
     {
       code: "INSPEC-VENT",
-      name: "Inspecao do ventilador",
+      name: "Inspeção do ventilador",
       description: "Verificar ruido, vibracao, corrente, alinhamento.",
       frequency: "T",
       durationMinutes: 60,
@@ -86,7 +86,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     },
     {
       code: "MEDIR-TEMP",
-      name: "Medicao de temperatura e umidade",
+      name: "Medição de temperatura e umidade",
       description: "Registrar valores de insuflamento e retorno em 3 pontos.",
       frequency: "M",
       durationMinutes: 30,
@@ -94,7 +94,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     },
     {
       code: "VERIFICAR-DRENO",
-      name: "Verificacao do sistema de dreno",
+      name: "Verificação do sistema de dreno",
       description: "Testar fluxo, sifao, ausencia de agua parada.",
       frequency: "B",
       durationMinutes: 20,
@@ -102,7 +102,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     },
     {
       code: "MEDIR-Pressao",
-      name: "Medicao de pressao estatica",
+      name: "Medição de pressão estática",
       description: "Comparar pressao real com projeto (variacao maxima 10%).",
       frequency: "T",
       durationMinutes: 25,
@@ -114,7 +114,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     chiller: [
       {
         code: "INSPEC-COMP",
-        name: "Inspecao do compressor",
+        name: "Inspeção do compressor",
         description: "Verificar amperagem, pressao de succao/descarga, nivel de oleo.",
         frequency: "M",
         durationMinutes: 90,
@@ -122,7 +122,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
       },
       {
         code: "ANALISE-AGUA",
-        name: "Analise de agua da torre",
+        name: "Análise de água da torre",
         description: "pH, dureza, condutividade, biocida.",
         frequency: "M",
         durationMinutes: 45,
@@ -132,7 +132,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     coolingtower: [
       {
         code: "INSPEC-COMP",
-        name: "Inspecao do compressor",
+        name: "Inspeção do compressor",
         description: "Verificar amperagem, pressao, ruido.",
         frequency: "M",
         durationMinutes: 90,
@@ -142,7 +142,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
     fancoil: [
       {
         code: "INSPEC-BOIA",
-        name: "Verificacao da boia de condensado",
+        name: "Verificação da boia de condensado",
         description: "Limpar e testar abertura/fechamento.",
         frequency: "T",
         durationMinutes: 15,
@@ -160,7 +160,7 @@ export function templateAtividadesHVAC(assetType: string): PmocActivityInput[] {
       },
       {
         code: "INSPEC-GAS",
-        name: "Inspecao do gas refrigerante",
+        name: "Inspeção do gás refrigerante",
         description: "Verificar manometros e variacao de pressao.",
         frequency: "S",
         durationMinutes: 30,
