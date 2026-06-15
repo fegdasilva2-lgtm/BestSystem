@@ -16,15 +16,15 @@ export interface PortalActionResult {
 
 export async function aceitarMedicaoPortal(form: FormData): Promise<PortalActionResult> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
   if (profile.role !== "cliente_gestor" && profile.role !== "admin_org") {
-    return { error: "Apenas cliente_gestor ou admin_org podem aceitar medicao." };
+    return { error: "Apenas cliente_gestor ou admin_org podem aceitar medição." };
   }
 
   const measurementId = String(form.get("measurementId") || "");
   const contractId = String(form.get("contractId") || "");
   const period = String(form.get("period") || "");
-  if (!measurementId) return { error: "measurementId obrigatorio." };
+  if (!measurementId) return { error: "measurementId obrigatório." };
 
   const supabase = await createSupabaseServer();
   const { data: current } = await supabase
@@ -33,9 +33,9 @@ export async function aceitarMedicaoPortal(form: FormData): Promise<PortalAction
     .eq("id", measurementId)
     .maybeSingle();
 
-  if (!current) return { error: "Medicao nao encontrada." };
+  if (!current) return { error: "Medição não encontrada." };
   if (current.status !== "pre_enviada" && current.status !== "em_aceite" && current.status !== "contestada") {
-    return { error: `Medicao ja esta no estado "${current.status}" e nao pode ser aceita.` };
+    return { error: `Medição já está no estado "${current.status}" e não pode ser aceita.` };
   }
 
   const { error } = await supabase
@@ -55,7 +55,7 @@ export async function aceitarMedicaoPortal(form: FormData): Promise<PortalAction
 
 export async function contestarMedicaoPortal(form: FormData): Promise<PortalActionResult> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
   if (profile.role !== "cliente_gestor" && profile.role !== "admin_org") {
     return { error: "Apenas cliente_gestor ou admin_org podem contestar." };
   }
@@ -63,9 +63,9 @@ export async function contestarMedicaoPortal(form: FormData): Promise<PortalActi
   const measurementId = String(form.get("measurementId") || "");
   const amount = Number(form.get("amount") || 0);
   const reason = String(form.get("reason") || "").trim();
-  if (!measurementId) return { error: "measurementId obrigatorio." };
-  if (!Number.isFinite(amount) || amount <= 0) return { error: "Valor invalido." };
-  if (!reason) return { error: "Motivo obrigatorio." };
+  if (!measurementId) return { error: "measurementId obrigatório." };
+  if (!Number.isFinite(amount) || amount <= 0) return { error: "Valor inválido." };
+  if (!reason) return { error: "Motivo obrigatório." };
 
   const supabase = await createSupabaseServer();
   const id = `ct-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -90,12 +90,12 @@ export async function contestarMedicaoPortal(form: FormData): Promise<PortalActi
 
 export async function comentarOSPortal(form: FormData): Promise<PortalActionResult> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
 
   const workOrderId = String(form.get("workOrderId") || "");
   const comment = String(form.get("comment") || "").trim();
-  if (!workOrderId) return { error: "workOrderId obrigatorio." };
-  if (!comment) return { error: "Comentario vazio." };
+  if (!workOrderId) return { error: "workOrderId obrigatório." };
+  if (!comment) return { error: "Comentário vazio." };
 
   const supabase = await createSupabaseServer();
   const id = `cm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;

@@ -21,9 +21,10 @@ create index if not exists checklist_templates_asset_idx
   where asset_id is not null;
 
 -- =====================================================================
-// View: v_preventive_plan (consumida pelo motor no PWA)
-// =====================================================================
-create or replace view public.v_preventive_plan as
+-- View: v_preventive_plan (consumida pelo motor no PWA)
+-- =====================================================================
+create or replace view public.v_preventive_plan
+with (security_invoker = true) as
 select
   ct.id, ct.tenant_id, ct.code, ct.name, ct.asset_id,
   a.code as asset_code, a.name as asset_name,

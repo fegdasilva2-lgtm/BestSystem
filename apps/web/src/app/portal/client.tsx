@@ -26,7 +26,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
   const [isPending, startTransition] = useTransition();
 
   function runAccept(med: Measurement) {
-    if (!confirm(`Aceitar medicao ${med.id} (${fmtBRL(med.net_amount)})?`)) return;
+    if (!confirm(`Aceitar medição ${med.id} (${fmtBRL(med.net_amount)})?`)) return;
     setFeedback(null);
     const fd = new FormData();
     fd.set("measurementId", med.id);
@@ -34,7 +34,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
     fd.set("period", med.period);
     startTransition(async () => {
       const r = await aceitarMedicaoPortal(fd);
-      setFeedback(r.error ? { type: "err", msg: r.error } : { type: "ok", msg: `Medicao ${med.id} aceita.` });
+      setFeedback(r.error ? { type: "err", msg: r.error } : { type: "ok", msg: `Medição ${med.id} aceita.` });
     });
   }
 
@@ -47,7 +47,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
       const r = await contestarMedicaoPortal(fd);
       if (r.error) setFeedback({ type: "err", msg: r.error });
       else {
-        setFeedback({ type: "ok", msg: `Contestacao registrada.` });
+        setFeedback({ type: "ok", msg: `Contestação registrada.` });
         setContestId(null);
         e.currentTarget.reset();
       }
@@ -63,7 +63,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
       const r = await comentarOSPortal(fd);
       if (r.error) setFeedback({ type: "err", msg: r.error });
       else {
-        setFeedback({ type: "ok", msg: `Comentario registrado.` });
+        setFeedback({ type: "ok", msg: `Comentário registrado.` });
         setCommentWoId(null);
         e.currentTarget.reset();
       }
@@ -81,10 +81,10 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
 
       <section className="section-grid two">
         <article className="glass-card">
-          <p className="eyebrow">Medicoes</p>
+          <p className="eyebrow">Medições</p>
           <h2>{measurements.length} recentes</h2>
           {measurements.length === 0 ? (
-            <p className="muted">Sem medicoes para exibir.</p>
+            <p className="muted">Sem medições para exibir.</p>
           ) : (
             <ul>
               {measurements.map((m) => (
@@ -102,7 +102,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
 
         <article className="glass-card">
           <p className="eyebrow">RGMs arquivados</p>
-          <h2>{rgmVersions.length} no historico</h2>
+          <h2>{rgmVersions.length} no histórico</h2>
           {rgmVersions.length === 0 ? (
             <p className="muted">Sem RGMs arquivados ainda.</p>
           ) : (
@@ -129,13 +129,13 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
         <div className="form-grid two">
           <div>
             <p className="eyebrow">Em andamento</p>
-            <h2>Ordens de servico</h2>
+            <h2>Ordens de serviço</h2>
           </div>
         </div>
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th>OS</th><th>Contrato</th><th>Tipo</th><th>Prioridade</th><th>Status</th><th>Vencimento</th><th>Acoes</th></tr>
+              <tr><th>OS</th><th>Contrato</th><th>Tipo</th><th>Prioridade</th><th>Status</th><th>Vencimento</th><th>Ações</th></tr>
             </thead>
             <tbody>
               {workOrders.map((wo) => (
@@ -152,7 +152,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
                 </tr>
               ))}
               {workOrders.length === 0 ? (
-                <tr><td colSpan={7} className="muted">Nenhuma OS visivel.</td></tr>
+                <tr><td colSpan={7} className="muted">Nenhuma OS visível.</td></tr>
               ) : null}
             </tbody>
           </table>
@@ -161,8 +161,8 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
 
       {(role === "cliente_gestor" || role === "admin_org") && measurements.some((m) => ["pre_enviada", "em_aceite", "contestada"].includes(m.status)) ? (
         <section className="form-card">
-          <h2>Acoes de aceite e contestacao</h2>
-          <p className="muted">Aprove ou conteste as medicoes em aberto para o seu tenant.</p>
+          <h2>Ações de aceite e contestação</h2>
+          <p className="muted">Aprove ou conteste as medições em aberto para o seu tenant.</p>
           <ul>
             {measurements.filter((m) => ["pre_enviada", "em_aceite", "contestada"].includes(m.status)).map((m) => (
               <li key={m.id} className="profile-row">
@@ -182,7 +182,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
 
       {medToContest ? (
         <section className="form-card">
-          <h2>Contestar medicao {medToContest.id}</h2>
+          <h2>Contestar medição {medToContest.id}</h2>
           <form onSubmit={runContest} className="form-grid">
             <label className="field">
               <span>Valor contestado (R$)</span>
@@ -194,7 +194,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
             </label>
             <div className="form-actions field full">
               <button type="button" className="ghost-button" onClick={() => setContestId(null)}>Cancelar</button>
-              <button type="submit" className="primary-button" disabled={isPending}>Registrar contestacao</button>
+              <button type="submit" className="primary-button" disabled={isPending}>Registrar contestação</button>
             </div>
           </form>
         </section>
@@ -205,12 +205,12 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
           <h2>Comentar OS {commentWoId}</h2>
           <form onSubmit={runComment} className="form-grid">
             <label className="field full">
-              <span>Comentario</span>
-              <textarea name="comment" required rows={3} placeholder="Observacao, pedido de informacao, satisfacao..."></textarea>
+              <span>Comentário</span>
+              <textarea name="comment" required rows={3} placeholder="Observação, pedido de informação, satisfação..."></textarea>
             </label>
             <div className="form-actions field full">
               <button type="button" className="ghost-button" onClick={() => setCommentWoId(null)}>Cancelar</button>
-              <button type="submit" className="primary-button" disabled={isPending}>Enviar comentario</button>
+              <button type="submit" className="primary-button" disabled={isPending}>Enviar comentário</button>
             </div>
           </form>
         </section>

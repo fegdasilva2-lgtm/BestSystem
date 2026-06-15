@@ -56,7 +56,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
     startTransition(async () => {
       const r = await registrarExecucaoPmoc(fd);
       if (r.error) setFeedback({ type: "err", msg: r.error });
-      else setFeedback({ type: "ok", msg: "Execucao PMOC registrada." });
+      else setFeedback({ type: "ok", msg: "Execução PMOC registrada." });
     });
   }
 
@@ -69,7 +69,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
       const arr = r.data as Array<{ planId: string; code: string; alerts: Array<{ kind: string; severity: string; message: string }> }>;
       const total = arr.reduce((s, p) => s + p.alerts.length, 0);
       const critical = arr.flatMap((p) => p.alerts).filter((a) => a.severity === "critica").length;
-      setFeedback({ type: "ok", msg: `Recalculado: ${total} alerta(s), ${critical} critico(s).` });
+      setFeedback({ type: "ok", msg: `Recalculado: ${total} alerta(s), ${critical} crítico(s).` });
     }
   }
 
@@ -81,10 +81,10 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
 
       <section className="callout-band">
         <div>
-          <p className="eyebrow" style={{ color: "#ffe3d4" }}>Conformidade regulatoria</p>
+          <p className="eyebrow" style={{ color: "#ffe3d4" }}>Conformidade regulatória</p>
           <strong>
-            O PMOC e gerado a partir de <code>templateAtividadesHVAC</code> (Lei 13.589 + ABNT NBR 16434),
-            customizado por tipo de ativo, e as execucoes sao imutaveis para fins de fiscalizacao.
+            O PMOC é gerado a partir de <code>templateAtividadesHVAC</code> (Lei 13.589 + ABNT NBR 16434),
+            customizado por tipo de ativo, e as execuções são imutáveis para fins de fiscalização.
           </strong>
         </div>
         {canManage ? (
@@ -99,7 +99,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
           <h2>Novo PMOC</h2>
           <form onSubmit={onCreate} className="form-grid">
             <label className="field">
-              <span>Codigo</span>
+              <span>Código</span>
               <input name="code" required placeholder="PMOC-2026-001" />
             </label>
             <label className="field">
@@ -117,7 +117,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               </select>
             </label>
             <label className="field">
-              <span>Inicio</span>
+              <span>Início</span>
               <input name="startsOn" type="date" required />
             </label>
             <label className="field">
@@ -126,7 +126,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
             </label>
             <label className="field">
               <span>RT (nome)</span>
-              <input name="rtName" required placeholder="Eng. Joao Silva" />
+              <input name="rtName" required placeholder="Eng. João Silva" />
             </label>
             <label className="field">
               <span>RT CREA</span>
@@ -141,7 +141,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <input name="rtPhone" placeholder="(11) 90000-0000" />
             </label>
             <label className="field">
-              <span>Numero da ART</span>
+              <span>Número da ART</span>
               <input name="artNumber" required placeholder="ART-2026-001" />
             </label>
             <label className="field">
@@ -149,7 +149,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <input name="artUrl" type="url" placeholder="https://..." />
             </label>
             <label className="field">
-              <span>Frequencia minima limpeza</span>
+              <span>Frequência mínima limpeza</span>
               <select name="minCleaningFrequency" defaultValue="M">
                 <option value="M">Mensal</option>
                 <option value="B">Bimestral</option>
@@ -161,7 +161,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <input name="minFilterChangeDays" type="number" min="30" defaultValue="90" />
             </label>
             <label className="field">
-              <span>Dias min. inspecao HVAC</span>
+              <span>Dias min. inspeção HVAC</span>
               <input name="minHvacInspectionDays" type="number" min="90" defaultValue="180" />
             </label>
             <div className="form-actions field full">
@@ -207,7 +207,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
           <h2>Atividades do PMOC {plans.find((p) => p.id === selectedPlanId)?.code}</h2>
           <p className="muted">{planActs(selectedPlanId).length} atividades (template HVAC + customizadas).</p>
           <table>
-            <thead><tr><th>Codigo</th><th>Ativo</th><th>Frequencia</th><th>Prioridade</th></tr></thead>
+            <thead><tr><th>Código</th><th>Ativo</th><th>Frequência</th><th>Prioridade</th></tr></thead>
             <tbody>
               {planActs(selectedPlanId).slice(0, 30).map((a) => (
                 <tr key={a.id}>
@@ -225,7 +225,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
 
       {selectedPlanId && canExecute ? (
         <section className="form-card">
-          <h2>Registrar execucao de uma atividade</h2>
+          <h2>Registrar execução de uma atividade</h2>
           <form onSubmit={onExecute} className="form-grid">
             <label className="field full">
               <span>Atividade</span>
@@ -252,7 +252,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <select name="result" required defaultValue="conforme">
                 <option value="conforme">Conforme</option>
                 <option value="parcialmente_conforme">Parcialmente conforme</option>
-                <option value="nao_conforme">Nao conforme</option>
+                <option value="nao_conforme">Não conforme</option>
               </select>
             </label>
             <label className="field">
@@ -264,7 +264,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <input name="readings" placeholder='{"temperatura": 22.5, "pressao": 1.2}' />
             </label>
             <label className="field full">
-              <span>Observacoes</span>
+              <span>Observações</span>
               <textarea name="observations" rows={2}></textarea>
             </label>
             <div className="form-actions field full">
@@ -275,9 +275,9 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
       ) : null}
 
       <section className="form-card">
-        <h2>Ultimas execucoes</h2>
+        <h2>Últimas execuções</h2>
         <table>
-          <thead><tr><th>Data</th><th>Ativo</th><th>Resultado</th><th>Proxima</th><th>Fotos</th></tr></thead>
+          <thead><tr><th>Data</th><th>Ativo</th><th>Resultado</th><th>Próxima</th><th>Fotos</th></tr></thead>
           <tbody>
             {executions.slice(0, 15).map((e) => (
               <tr key={e.id}>
@@ -288,7 +288,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
                 <td>{e.photo_count}</td>
               </tr>
             ))}
-            {executions.length === 0 ? <tr><td colSpan={5} className="muted">Nenhuma execucao.</td></tr> : null}
+            {executions.length === 0 ? <tr><td colSpan={5} className="muted">Nenhuma execução.</td></tr> : null}
           </tbody>
         </table>
       </section>

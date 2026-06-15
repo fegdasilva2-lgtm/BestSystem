@@ -6,7 +6,7 @@ import PortalClient from "./client";
 export default async function PortalPage() {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    redirect("/login?error=Sessao invalida&next=/portal");
+    redirect("/login?error=Sessão inválida&next=/portal");
   }
   if (!["cliente_gestor", "admin_org"].includes(profile.role)) {
     redirect("/admin?error=Portal restrito a cliente_gestor");
@@ -44,7 +44,7 @@ export default async function PortalPage() {
         <p className="eyebrow">Portal do cliente</p>
         <h1>Bem-vindo, {profile.name}.</h1>
         <p>
-          Tenant {profile.tenant.name} - contrato(s) ativos, medicoes pendentes de aceite,
+          Tenant {profile.tenant.name} - contrato(s) ativos, medições pendentes de aceite,
           OS em andamento e RGM arquivados.
         </p>
       </header>

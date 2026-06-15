@@ -18,13 +18,12 @@ export interface PmocResult {
 
 export async function criarPmoc(form: FormData): Promise<PmocResult> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
   if (!["admin_org", "gestor_facilities"].includes(profile.role)) {
     return { error: "Apenas admin_org ou gestor_facilities podem criar PMOC." };
   }
 
   const plan = {
-    id: `pmoc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     tenant_id: profile.tenant.id,
     contract_id: String(form.get("contractId") || ""),
     site_id: String(form.get("siteId") || ""),
@@ -44,19 +43,19 @@ export async function criarPmoc(form: FormData): Promise<PmocResult> {
     version_lock: 1
   };
 
-  if (!plan.code) return { error: "Codigo obrigatorio." };
-  if (!plan.contract_id || !plan.site_id) return { error: "Contrato e site obrigatorios." };
+  if (!plan.code) return { error: "Código obrigatório." };
+  if (!plan.contract_id || !plan.site_id) return { error: "Contrato e site obrigatórios." };
   if (!plan.rt_name || !plan.rt_crea || !plan.art_number) {
-    return { error: "RT (nome, CREA) e ART obrigatorios." };
+    return { error: "RT (nome, CREA) e ART obrigatórios." };
   }
-  if (!plan.starts_on || !plan.ends_on) return { error: "Vigencia obrigatoria." };
-  if (plan.ends_on <= plan.starts_on) return { error: "Termo deve ser maior que inicio." };
+  if (!plan.starts_on || !plan.ends_on) return { error: "Vigência obrigatória." };
+  if (plan.ends_on <= plan.starts_on) return { error: "Termo deve ser maior que início." };
 
   const supabase = await createSupabaseServer();
   const { data: created, error } = await supabase
     .from("pmoc_plans")
     .insert(plan)
-    .select("id")
+    .select("id, contract_id, site_id, code, starts_on, ends_on, rt_name, rt_crea, art_number")
     .single();
   if (error) return { error: error.message };
 
@@ -67,9 +66,33 @@ export async function criarPmoc(form: FormData): Promise<PmocResult> {
     .eq("tenant_id", profile.tenant.id)
     .eq("site_id", plan.site_id);
 
-  const result = gerarPmoc({ plan, assets: hvacAssets ?? [] });
+  const result = gerarPmoc({
+    plan: {
+      id: created.id,
+      contractId: created.contract_id,
+      siteId: created.site_id,
+      code: created.code,
+      startsOn: created.starts_on,
+      endsOn: created.ends_on,
+      rtName: created.rt_name,
+      rtCrea: created.rt_crea,
+      artNumber: created.art_number
+    },
+    assets: hvacAssets ?? []
+  });
   for (const act of result.activities) {
-    await supabase.from("pmoc_activities").insert({ ...act, tenant_id: profile.tenant.id });
+    const { error: activityError } = await supabase.from("pmoc_activities").insert({
+      tenant_id: profile.tenant.id,
+      pmoc_plan_id: act.pmocPlanId,
+      asset_id: act.assetId,
+      code: act.code,
+      name: act.name,
+      description: act.description,
+      frequency: act.frequency,
+      duration_minutes: act.durationMinutes,
+      priority: act.priority
+    });
+    if (activityError) return { error: activityError.message };
   }
 
   revalidatePath("/admin/pmoc");
@@ -78,9 +101,9 @@ export async function criarPmoc(form: FormData): Promise<PmocResult> {
 
 export async function registrarExecucaoPmoc(form: FormData): Promise<PmocResult> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
   if (!["tecnico", "supervisor", "admin_org", "gestor_facilities"].includes(profile.role)) {
-    return { error: "Apenas tecnico, supervisor, admin_org ou gestor_facilities podem registrar execucao." };
+    return { error: "Apenas tecnico, supervisor, admin_org ou gestor_facilities podem registrar execução." };
   }
 
   const pmocActivityId = String(form.get("pmocActivityId") || "");
@@ -93,9 +116,9 @@ export async function registrarExecucaoPmoc(form: FormData): Promise<PmocResult>
   let readings = null;
   if (readingsRaw) {
     try { readings = JSON.parse(readingsRaw); }
-    catch { return { error: "readings invalido - nao parece JSON" }; }
+    catch { return { error: "readings inválido - não parece JSON" }; }
   }
-  if (!pmocActivityId || !assetId) return { error: "Atividade e ativo obrigatorios." };
+  if (!pmocActivityId || !assetId) return { error: "Atividade e ativo obrigatórios." };
 
   const supabase = await createSupabaseServer();
   const { data: act } = await supabase
@@ -103,7 +126,7 @@ export async function registrarExecucaoPmoc(form: FormData): Promise<PmocResult>
     .select("pmoc_plan_id, frequency")
     .eq("id", pmocActivityId)
     .maybeSingle();
-  if (!act) return { error: "Atividade nao encontrada." };
+  if (!act) return { error: "Atividade não encontrada." };
 
   const executedAt = new Date().toISOString();
   const nextDueAt = calcularProximaExecucao({ lastExecutedAt: executedAt, frequency: act.frequency });
@@ -129,7 +152,7 @@ export async function registrarExecucaoPmoc(form: FormData): Promise<PmocResult>
 
 export async function listarAlertasPmoc(form: FormData): Promise<{ error?: string; data?: unknown }> {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Sessao invalida." };
+  if (!profile?.active || !profile.tenant) return { error: "Sessão inválida." };
   const supabase = await createSupabaseServer();
   const [{ data: plans }, { data: activities }, { data: executions }] = await Promise.all([
     supabase.from("pmoc_plans").select("*").eq("active", true),
@@ -139,7 +162,38 @@ export async function listarAlertasPmoc(form: FormData): Promise<{ error?: strin
   const result = (plans ?? []).map((plan) => {
     const acts = (activities ?? []).filter((a) => a.pmoc_plan_id === plan.id);
     const exes = (executions ?? []).filter((e) => e.pmoc_plan_id === plan.id);
-    const r = gerarAlertas({ plan, activities: acts, executions: exes });
+    const r = gerarAlertas({
+      plan: {
+        id: plan.id,
+        contractId: plan.contract_id,
+        siteId: plan.site_id,
+        code: plan.code,
+        startsOn: plan.starts_on,
+        endsOn: plan.ends_on,
+        rtName: plan.rt_name,
+        rtCrea: plan.rt_crea,
+        artNumber: plan.art_number
+      },
+      activities: acts.map((activity) => ({
+        id: activity.id,
+        pmocPlanId: activity.pmoc_plan_id,
+        assetId: activity.asset_id,
+        code: activity.code,
+        name: activity.name,
+        description: activity.description ?? "",
+        frequency: activity.frequency,
+        durationMinutes: activity.duration_minutes,
+        priority: activity.priority
+      })),
+      executions: exes.map((execution) => ({
+        id: execution.id,
+        pmocActivityId: execution.pmoc_activity_id,
+        assetId: execution.asset_id,
+        executedAt: execution.executed_at,
+        nextDueAt: execution.next_due_at,
+        result: execution.result
+      }))
+    });
     return { planId: plan.id, code: plan.code, ...r };
   });
   return { data: result };

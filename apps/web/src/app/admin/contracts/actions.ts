@@ -9,7 +9,7 @@ export interface CreateContractResult { id?: string; error?: string; }
 export async function createContract(form: FormData): Promise<CreateContractResult> {
   const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
+  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo é obrigatório." };
 
   const customerId = String(form.get("customer_id") || "");
   if (!customerId) return { error: "Selecione um cliente." };
@@ -29,9 +29,9 @@ export async function createContract(form: FormData): Promise<CreateContractResu
     rgm_periodicity: String(form.get("rgm_periodicity") || "mensal")
   };
 
-  if (!payload.code) return { error: "Codigo do contrato e obrigatorio." };
-  if (!payload.scope) return { error: "Escopo e obrigatorio." };
-  if (!payload.starts_on) return { error: "Data de inicio e obrigatoria." };
+  if (!payload.code) return { error: "Código do contrato é obrigatório." };
+  if (!payload.scope) return { error: "Escopo é obrigatório." };
+  if (!payload.starts_on) return { error: "Data de início é obrigatória." };
 
   const { data, error } = await supabase
     .from("contracts")

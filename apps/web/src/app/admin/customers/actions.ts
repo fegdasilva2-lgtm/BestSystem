@@ -14,7 +14,7 @@ export interface CreateCustomerResult {
 export async function createCustomer(form: FormData): Promise<CreateCustomerResult> {
   const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
+  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo é obrigatório." };
 
   const payload = {
     tenant_id: profile.tenant.id,
@@ -25,7 +25,7 @@ export async function createCustomer(form: FormData): Promise<CreateCustomerResu
     contact_phone: String(form.get("contact_phone") || "").trim() || null
   };
 
-  if (!payload.name) return { error: "Nome do cliente e obrigatorio." };
+  if (!payload.name) return { error: "Nome do cliente é obrigatório." };
 
   const { data, error } = await supabase
     .from("customers")

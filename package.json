@@ -22,9 +22,16 @@
     "test:pmoc": "node tests/pmoc.test.mjs",
     "test:nfse-trabalhista": "node tests/nfse-trabalhista.test.mjs",
     "test": "npm run test:importer && npm run test:schedule && npm run test:conflict && npm run test:load && npm run test:measurement && npm run test:sla && npm run test:authorization && npm run test:pmoc && npm run test:nfse-trabalhista",
+    "supabase:login": "supabase login",
+    "supabase:create": "supabase projects create predialops-homolog --region sa-east-1 --size micro",
+    "supabase:link": "supabase link --project-ref saunmtbsjwgvcwqfxhzb",
+    "supabase:start": "supabase start",
+    "supabase:status": "supabase status -o env",
+    "supabase:config:push": "supabase config push",
+    "supabase:migrate": "supabase db push --linked",
     "db:types": "supabase gen types typescript --linked > packages/ds/src/db-types.ts",
     "db:reset": "supabase db reset",
-    "db:push": "supabase db push",
+    "db:push": "supabase db push --linked",
     "fn:typecheck": "deno check supabase/functions/custom-access-token/index.ts supabase/functions/rls-isolation-test/index.ts",
     "fn:deploy": "supabase functions deploy --no-verify-jwt custom-access-token && supabase functions deploy --no-verify-jwt rls-isolation-test",
     "fn:serve": "supabase functions serve --no-verify-jwt custom-access-token,rls-isolation-test",
@@ -40,5 +47,8 @@
     "supabase",
     "nextjs"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "supabase": "^2.106.0"
+  }
 }

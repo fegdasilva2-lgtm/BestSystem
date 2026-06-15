@@ -18,7 +18,7 @@ export default async function SetupPage({
     if (error) setupError = error.message;
     hasUsers = (count ?? 0) > 0;
   } catch (err) {
-    setupError = err instanceof Error ? err.message : "Configuracao de Supabase indisponivel.";
+    setupError = err instanceof Error ? err.message : "Configuração de Supabase indisponível.";
   }
 
   if (hasUsers) redirect("/login");
@@ -29,8 +29,8 @@ export default async function SetupPage({
         <p className="eyebrow">Setup inicial</p>
         <h1>Criar primeiro administrador.</h1>
         <p>
-          Use esta tela uma unica vez no sandbox. Ela cria o tenant IMC Facilities se necessario,
-          cria o usuario no Supabase Auth e vincula o perfil `admin_org`.
+          Use esta tela uma única vez no sandbox. Ela cria o tenant IMC Facilities se necessário,
+          cria o usuário no Supabase Auth e vincula o perfil <code>admin_org</code>.
         </p>
       </header>
 
@@ -58,10 +58,10 @@ export default async function SetupPage({
         </form>
 
         <aside className="glass-card auth-note">
-          <p className="eyebrow">Seguranca</p>
-          <h2>Bloqueio automatico</h2>
+          <p className="eyebrow">Segurança</p>
+          <h2>Bloqueio automático</h2>
           <p className="muted">
-            Quando o primeiro `users_profile` existir, esta rota redireciona para `/login` e nao permite novo bootstrap.
+            Quando o primeiro <code>users_profile</code> existir, esta rota redireciona para <code>/login</code> e não permite novo bootstrap.
           </p>
         </aside>
       </section>

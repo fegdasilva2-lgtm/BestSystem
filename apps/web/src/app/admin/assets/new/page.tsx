@@ -23,16 +23,16 @@ export default async function NewAssetPage() {
         await createAsset(formData);
       }} className="form-card">
         <fieldset className="form-section">
-          <legend>Identificacao</legend>
+          <legend>Identificação</legend>
           <div className="form-grid">
-            <Field name="code" label="TAG / Codigo" required placeholder="AT-AC-0007" />
+            <Field name="code" label="TAG / Código" required placeholder="AT-AC-0007" />
             <Field name="name" label="Nome" required placeholder="Fancoil FC-A3-07" />
             <Field name="type" label="Tipo" placeholder="fancoil, chiller, bomba..." />
             <Select name="criticality" label="Criticidade" required defaultValue="media">
               <option value="baixa">Baixa</option>
-              <option value="media">Media</option>
+              <option value="media">Média</option>
               <option value="alta">Alta</option>
-              <option value="critica">Critica</option>
+              <option value="critica">Crítica</option>
             </Select>
           </div>
         </fieldset>
@@ -42,31 +42,31 @@ export default async function NewAssetPage() {
           <div className="form-grid">
             <Field name="manufacturer" label="Fabricante" />
             <Field name="model" label="Modelo" />
-            <Field name="serial" label="Numero de serie" />
+            <Field name="serial" label="Número de série" />
           </div>
         </fieldset>
 
         <fieldset className="form-section">
-          <legend>Localizacao</legend>
+          <legend>Localização</legend>
           <div className="form-grid">
             <Select name="site_id" label="Site" required>
               <option value="">Selecione...</option>
               {(sites ?? []).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </Select>
-            <Select name="location_id" label="Localizacao existente">
+            <Select name="location_id" label="Localização existente">
               <option value="">-- criar nova --</option>
               {(locations ?? []).map((l) => (
                 <option key={l.id} value={l.id} data-site={l.site_id}>{l.name} ({l.type})</option>
               ))}
             </Select>
-            <Field name="new_location" label="Ou nova localizacao" placeholder="Sala 304" />
+            <Field name="new_location" label="Ou nova localização" placeholder="Sala 304" />
           </div>
         </fieldset>
 
         <fieldset className="form-section">
           <legend>Garantia</legend>
           <div className="form-grid">
-            <Field name="install_date" label="Data de instalacao" type="date" />
+            <Field name="install_date" label="Data de instalação" type="date" />
             <Field name="warranty_until" label="Termo da garantia" type="date" />
           </div>
         </fieldset>

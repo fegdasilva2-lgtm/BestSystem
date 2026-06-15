@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PredialOps | Facilities SaaS",
-  description: "Plataforma SaaS brasileira para gestao de contratos de manutencao predial.",
+  description: "Plataforma SaaS brasileira para gestão de contratos de manutenção predial.",
   manifest: "/manifest.webmanifest"
 };
 
@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="pt-BR">
       <body>
         <div className="app-chrome">
-          <nav className="top-rail" aria-label="Navegacao principal">
+          <nav className="top-rail" aria-label="Navegação principal">
             <a className="brand-lockup" href="/">
               <span className="brand-mark" aria-hidden="true">P</span>
               <span className="brand-text">
@@ -30,10 +30,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </span>
             </a>
             <div className="rail-links">
-              <a href="/admin">Onboarding</a>
-              <a href="/admin/users">Usuarios</a>
+              <a href="/admin">Operação</a>
+              <a href="/admin/users">Acessos</a>
               <a href="/admin/contracts/new">Contrato</a>
               <a href="/admin/assets/new">Ativo</a>
+              <a href="/admin/rgm">RGM</a>
             </div>
             <div className="user-rail">
               {profile?.active && profile.tenant ? (

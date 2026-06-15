@@ -34,10 +34,16 @@ Deno.serve(async () => {
 
   // 1. Cria usuarios
   const a = await admin.auth.admin.createUser({
-    email: USER_A, password: PASSWORD, email_confirm: true
+    email: USER_A,
+    password: PASSWORD,
+    email_confirm: true,
+    app_metadata: { tenant_id: TENANT_A, user_role: "admin_org", user_active: true }
   });
   const b = await admin.auth.admin.createUser({
-    email: USER_B, password: PASSWORD, email_confirm: true
+    email: USER_B,
+    password: PASSWORD,
+    email_confirm: true,
+    app_metadata: { tenant_id: TENANT_B, user_role: "admin_org", user_active: true }
   });
   if (a.error || b.error) {
     return json({ passed: false, results: [{ name: "create users", passed: false, detail: a.error?.message ?? b.error?.message ?? "unknown" }] });

@@ -13,7 +13,7 @@ export default async function NewSitePage() {
       <header className="page-header">
         <p className="eyebrow">EAM</p>
         <h1>Nova unidade.</h1>
-        <p>Registre o local fisico que agrupa ambientes, ativos e cronogramas do contrato.</p>
+        <p>Registre o local físico que agrupa ambientes, ativos e cronogramas do contrato.</p>
       </header>
 
       <form action={async (formData) => {
@@ -30,7 +30,7 @@ export default async function NewSitePage() {
         <label className="field">
           <span>Contrato (opcional)</span>
           <select name="contract_id">
-            <option value="">Sem vinculo direto</option>
+            <option value="">Sem vínculo direto</option>
             {(contracts ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}
           </select>
         </label>
@@ -39,7 +39,7 @@ export default async function NewSitePage() {
           <input name="name" required placeholder="Torre A" />
         </label>
         <label className="field">
-          <span>Endereco</span>
+          <span>Endereço</span>
           <input name="address" placeholder="Av. Paulista, 1000" />
         </label>
         <label className="field">

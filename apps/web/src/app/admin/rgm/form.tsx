@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { previewRgm, saveRgmTemplate, archiveRgm } from "./actions";
-import type { RgmBlock } from "./actions";
+import type { RgmBlock } from "./types";
 
 interface Contract {
   id: string;
@@ -25,9 +25,9 @@ const BLOCK_LABELS: Record<string, string> = {
   previsto_realizado: "Previsto x Realizado",
   sla: "SLA",
   chamados: "Chamados",
-  medicao: "Medicao",
-  fotos: "Evidencia fotografica",
-  recomendacoes: "Recomendacoes"
+  medicao: "Medição",
+  fotos: "Evidência fotográfica",
+  recomendacoes: "Recomendações"
 };
 
 export default function RgmForm({ contracts, initialBlocks, canArchive }: Props) {
@@ -78,7 +78,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
 
   function onArchive() {
     if (!preview) return;
-    if (!confirm("Arquivar o RGM como versao imutavel? Esta acao congela o relatorio.")) return;
+    if (!confirm("Arquivar o RGM como versão imutável? Esta ação congela o relatório.")) return;
     setError(null);
     const fd = new FormData();
     fd.set("contractId", contractId);
@@ -106,7 +106,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
             </select>
           </label>
           <label className="field">
-            <span>Periodo (YYYY-MM)</span>
+            <span>Período (YYYY-MM)</span>
             <input type="month" value={period} onChange={(e) => { setPeriod(e.target.value); setPreview(null); }} />
           </label>
         </div>
@@ -122,7 +122,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
 
         <div className="form-actions">
           <button className="primary-button" type="button" onClick={onPreview} disabled={isPending}>
-            {isPending ? "Gerando..." : "Gerar previa"}
+            {isPending ? "Gerando..." : "Gerar prévia"}
           </button>
           <button className="ghost-button" type="button" onClick={onSaveTemplate} disabled={isPending}>
             Salvar template
@@ -137,7 +137,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
           <header className="report-head">
             <div>
               <p className="eyebrow">RGM {preview.contractCode} - {preview.period}</p>
-              <h2>Relatorio de Gestao Mensal</h2>
+              <h2>Relatório de Gestão Mensal</h2>
             </div>
             {contract ? (
               <div className="report-meta">
@@ -160,7 +160,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
               <h3>Previsto x Realizado</h3>
               <ul>
                 <li>OS previstas: {preview.data.scheduledWorkOrders}</li>
-                <li>OS concluidas: {preview.data.completedWorkOrders}</li>
+                <li>OS concluídas: {preview.data.completedWorkOrders}</li>
                 <li>OS aprovadas: {preview.data.approvedWorkOrders}</li>
               </ul>
             </article>
@@ -182,24 +182,24 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
 
           {preview.blocks.find((b) => b.id === "medicao" && b.enabled) ? (
             <article className="report-block">
-              <h3>Medicao</h3>
+              <h3>Medição</h3>
               {preview.data.measurement ? (
                 <ul>
                   <li>Bruto: R$ {preview.data.measurement.gross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</li>
                   <li>Glosa: R$ {preview.data.measurement.discount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</li>
-                  <li>Liquido: R$ {preview.data.measurement.net.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</li>
+                  <li>Líquido: R$ {preview.data.measurement.net.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</li>
                 </ul>
-              ) : <p className="muted">Sem medicao aprovada para o periodo.</p>}
+              ) : <p className="muted">Sem medição aprovada para o período.</p>}
             </article>
           ) : null}
 
           {preview.blocks.find((b) => b.id === "recomendacoes" && b.enabled) ? (
             <article className="report-block">
-              <h3>Recomendacoes</h3>
+              <h3>Recomendações</h3>
               <ul>
-                <li>Reforcar plano de manutencao preventiva nos ativos de criticidade alta.</li>
-                <li>Revisar SLA com foco em chamados de prioridade critica.</li>
-                <li>Auditoria mensal de glosa para identificar padroes.</li>
+                <li>Reforçar plano de manutenção preventiva nos ativos de criticidade alta.</li>
+                <li>Revisar SLA com foco em chamados de prioridade crítica.</li>
+                <li>Auditoria mensal de glosa para identificar padrões.</li>
               </ul>
             </article>
           ) : null}
@@ -208,7 +208,7 @@ export default function RgmForm({ contracts, initialBlocks, canArchive }: Props)
             <span className="muted">Gerado em {new Date().toLocaleString("pt-BR")}</span>
             {canArchive ? (
               <button className="primary-button" type="button" onClick={onArchive} disabled={isPending}>
-                Arquivar versao
+                Arquivar versão
               </button>
             ) : (
               <span className="muted">Apenas cliente_gestor ou admin_org pode arquivar.</span>

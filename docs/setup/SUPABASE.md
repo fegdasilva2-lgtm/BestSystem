@@ -4,7 +4,28 @@ Regiao obrigatoria: **sa-east-1 (Sao Paulo)** por causa de LGPD e latencia.
 
 ## 1. Criar o projeto
 
-1. Acesse https://app.supabase.com e crie um projeto:
+Projeto remoto selecionado:
+
+```text
+https://supabase.com/dashboard/project/saunmtbsjwgvcwqfxhzb
+```
+
+O repo usa a Supabase CLI como dependencia de desenvolvimento. Primeiro autentique:
+
+```bash
+npm run supabase:login
+```
+
+O projeto remoto ja existe. Caso seja necessario criar outro no futuro, informe `--org-id`
+e `--db-password` no comando, sem gravar a senha no repositorio:
+
+```bash
+npm run supabase:create -- --org-id <org-id> --db-password <senha-forte-do-postgres>
+```
+
+Alternativamente, crie pelo dashboard em https://app.supabase.com:
+
+1. Crie um projeto:
    - Nome: `predialops-homolog`
    - Database password: gerar e guardar em cofre (1Password, Vault, etc.)
    - Region: **South America (Sao Paulo)**
@@ -21,10 +42,10 @@ Regiao obrigatoria: **sa-east-1 (Sao Paulo)** por causa de LGPD e latencia.
 Localmente, com o Supabase CLI autenticado e linkado ao projeto:
 
 ```bash
-supabase link --project-ref <ref>
-supabase db push
-# ou, em ambiente de producao:
-# supabase db push --include-all
+npm run supabase:link
+npm run supabase:migrate
+npm run supabase:config:push
+npm run fn:deploy
 ```
 
 As migrations estao em `supabase/migrations/`:
@@ -33,14 +54,28 @@ As migrations estao em `supabase/migrations/`:
 - `0002_rls_policies.sql` - Row-Level Security por `tenant_id`
 - `0003_audit_and_outbox.sql` - triggers de auditoria e outbox pattern
 - `0004_storage.sql` - buckets `evidence`, `rgm`, `contracts`
-- `0005_seed_sandbox.sql` - 3 tenants ficticios para o sandbox
+- `0005_seed_sandbox.sql` - 3 tenants ficticios e usuarios de gestao para o sandbox
 
 Apos `db push`, confirme no SQL editor:
 
 ```sql
 select count(*) from tenants;
 -- esperado: 3
+
+select email, role, active
+from users_profile
+where email like '%.gestao@predialops.test'
+order by role;
+-- esperado: 3 usuarios ativos
 ```
+
+Usuarios de teste de gestao no tenant `IMC Facilities`:
+
+| E-mail | Perfil | Senha |
+|---|---|---|
+| `superadmin.gestao@predialops.test` | Super admin SaaS | `PredialOps!2026` |
+| `admin.gestao@predialops.test` | Administrador da empresa | `PredialOps!2026` |
+| `gestor.gestao@predialops.test` | Gestor de facilities | `PredialOps!2026` |
 
 ## 3. Gerar tipos TypeScript
 
@@ -55,9 +90,12 @@ O arquivo gerado sobrescreve os tipos manuais; a partir dai o web ganha autocomp
 ### Vercel (apps/web)
 | Variavel | Valor |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://saunmtbsjwgvcwqfxhzb.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key do projeto |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role (server-side only) |
+
+Para desenvolvimento local, copie esses mesmos valores para `apps/web/.env.local`.
+Nao use `NEXT_PUBLIC_` em nenhuma chave de servidor.
 
 ### PWA (apps/mobile)
 Em `apps/mobile/lib/supabase.js`, o cliente busca as chaves de:

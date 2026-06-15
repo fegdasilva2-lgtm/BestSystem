@@ -9,7 +9,7 @@ export interface CreateSiteResult { id?: string; error?: string; }
 export async function createSite(form: FormData): Promise<CreateSiteResult> {
   const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
+  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo é obrigatório." };
 
   const customerId = String(form.get("customer_id") || "");
   const contractId = String(form.get("contract_id") || "") || null;
@@ -24,7 +24,7 @@ export async function createSite(form: FormData): Promise<CreateSiteResult> {
     timezone: String(form.get("timezone") || "America/Sao_Paulo")
   };
 
-  if (!payload.name) return { error: "Nome do site e obrigatorio." };
+  if (!payload.name) return { error: "Nome do site é obrigatório." };
 
   const { data, error } = await supabase.from("sites").insert(payload).select("id").single();
   if (error) return { error: error.message };

@@ -16,14 +16,14 @@ export async function bootstrapFirstAdmin(form: FormData) {
     .select("id", { count: "exact", head: true });
 
   if (countError) fail(countError.message);
-  if ((count ?? 0) > 0) fail("Setup bloqueado: ja existe usuario provisionado.");
+  if ((count ?? 0) > 0) fail("Setup bloqueado: já existe usuário provisionado.");
 
   const name = String(form.get("name") || "").trim();
   const email = String(form.get("email") || "").trim().toLowerCase();
   const password = String(form.get("password") || "");
 
-  if (!name) fail("Nome e obrigatorio.");
-  if (!email) fail("E-mail e obrigatorio.");
+  if (!name) fail("Nome é obrigatório.");
+  if (!email) fail("E-mail é obrigatório.");
   if (password.length < 8) fail("Senha deve ter pelo menos 8 caracteres.");
 
   const { data: existingTenant } = await admin
@@ -58,7 +58,7 @@ export async function bootstrapFirstAdmin(form: FormData) {
   });
 
   if (authError || !created.user) {
-    fail(authError?.message ?? "Nao foi possivel criar o usuario no Supabase Auth.");
+    fail(authError?.message ?? "Não foi possível criar o usuário no Supabase Auth.");
   }
 
   const { error: profileError } = await admin.from("users_profile").insert({

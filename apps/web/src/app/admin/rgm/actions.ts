@@ -10,41 +10,8 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
 import { getSessionProfile } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-
-export interface RgmBlock {
-  id: string;
-  label: string;
-  enabled: boolean;
-  // configuracao especifica por bloco, livre
-  config?: Record<string, unknown>;
-}
-
-export interface RgmTemplate {
-  id: string;
-  tenantId: string;
-  contractId: string;
-  name: string;
-  blocks: RgmBlock[];
-  updatedAt: string;
-  updatedBy: string;
-}
-
-export interface RgmPreview {
-  contractId: string;
-  contractCode: string;
-  period: string;
-  blocks: RgmBlock[];
-  // Dados agregados para a previa
-  data: {
-    scheduledWorkOrders: number;
-    completedWorkOrders: number;
-    approvedWorkOrders: number;
-    onTimePct: number;
-    openRequests: number;
-    measurement: { gross: number; discount: number; net: number } | null;
-    executiveSummary: string;
-  };
-}
+import { defaultBlocks } from "./defaults";
+import type { RgmBlock, RgmPreview } from "./types";
 
 /**
  * Salva o template de RGM para um contrato. Apenas o dono do tenant pode.
@@ -52,14 +19,14 @@ export interface RgmPreview {
 export async function saveRgmTemplate(form: FormData): Promise<{ error?: string; id?: string }> {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    return { error: "Sessao invalida." };
+    return { error: "Sessão inválida." };
   }
   if (!["admin_org", "gestor_facilities"].includes(profile.role)) {
     return { error: "Apenas admin_org ou gestor_facilities podem salvar o template." };
   }
 
   const contractId = String(form.get("contractId") || "");
-  if (!contractId) return { error: "Contrato obrigatorio." };
+  if (!contractId) return { error: "Contrato obrigatório." };
 
   const blocks: RgmBlock[] = [];
   const all = form.getAll("blockId");
@@ -96,13 +63,13 @@ export async function saveRgmTemplate(form: FormData): Promise<{ error?: string;
 export async function previewRgm(form: FormData): Promise<{ error?: string; data?: RgmPreview }> {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    return { error: "Sessao invalida." };
+    return { error: "Sessão inválida." };
   }
 
   const contractId = String(form.get("contractId") || "");
   const period = String(form.get("period") || "");
-  if (!contractId) return { error: "Contrato obrigatorio." };
-  if (!/^\d{4}-\d{2}$/.test(period)) return { error: "Periodo invalido." };
+  if (!contractId) return { error: "Contrato obrigatório." };
+  if (!/^\d{4}-\d{2}$/.test(period)) return { error: "Período inválido." };
 
   const supabase = await createSupabaseServer();
   const [tplRes, contractRes, woRes, medRes, reqRes] = await Promise.all([
@@ -164,7 +131,7 @@ export async function previewRgm(form: FormData): Promise<{ error?: string; data
 export async function archiveRgm(form: FormData): Promise<{ error?: string; id?: string }> {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    return { error: "Sessao invalida." };
+    return { error: "Sessão inválida." };
   }
   if (!["cliente_gestor", "admin_org"].includes(profile.role)) {
     return { error: "Apenas cliente_gestor ou admin_org podem arquivar." };
@@ -176,7 +143,7 @@ export async function archiveRgm(form: FormData): Promise<{ error?: string; id?:
 
   let preview: RgmPreview;
   try { preview = JSON.parse(previewJson); }
-  catch { return { error: "Preview invalido." }; }
+  catch { return { error: "Preview inválido." }; }
 
   const admin = createSupabaseAdmin();
   const id = `rgm-${contractId}-${period}-${Date.now()}`;
@@ -217,19 +184,6 @@ function nextMonth(period: string) {
   return `${ny}-${String(nm).padStart(2, "0")}-01`;
 }
 
-export function defaultBlocks(): RgmBlock[] {
-  return [
-    { id: "capa",           label: "Capa",            enabled: true },
-    { id: "resumo",         label: "Resumo executivo", enabled: true },
-    { id: "previsto_realizado", label: "Previsto x Realizado", enabled: true },
-    { id: "sla",            label: "SLA",             enabled: true },
-    { id: "chamados",       label: "Chamados",        enabled: true },
-    { id: "medicao",        label: "Medicao",         enabled: true },
-    { id: "fotos",          label: "Evidencia fotografica", enabled: true },
-    { id: "recomendacoes",  label: "Recomendacoes",   enabled: true }
-  ];
-}
-
 function buildSummary({ contractCode, period, completed, scheduled, onTimePct, openRequests, med }: {
   contractCode: string;
   period: string;
@@ -244,13 +198,13 @@ function buildSummary({ contractCode, period, completed, scheduled, onTimePct, o
   const exec = scheduled > 0 ? Math.round((completed / scheduled) * 100) : 0;
   const medTxt = med
     ? `Faturamento previsto: R$ ${Number(med.net_amount ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (glosa de R$ ${Number(med.discount_amount ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}).`
-    : "Medicao do periodo ainda nao aprovada.";
+    : "Medição do período ainda não aprovada.";
   return (
-    `Contrato ${contractCode} - competencia ${mes}. ` +
-    `Executadas ${completed} de ${scheduled} OS previstas (aderencia de ${exec}%); ` +
-    `cumprimento de SLA em ${compliance}% das concluidas. ` +
+    `Contrato ${contractCode} - competência ${mes}. ` +
+    `Executadas ${completed} de ${scheduled} OS previstas (aderência de ${exec}%); ` +
+    `cumprimento de SLA em ${compliance}% das concluídas. ` +
     `${openRequests} chamado(s) em triagem. ${medTxt} ` +
-    `Pontos de atencao e recomendacoes constam no detalhamento.`
+    `Pontos de atenção e recomendações constam no detalhamento.`
   );
 }
 

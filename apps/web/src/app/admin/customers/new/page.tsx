@@ -6,7 +6,7 @@ export default function NewCustomerPage() {
       <header className="page-header">
         <p className="eyebrow">Cadastro inicial</p>
         <h1>Novo cliente.</h1>
-        <p>Comece pela entidade que agrupa contratos, unidades, usuarios e aceite de medicao.</p>
+        <p>Comece pela entidade que agrupa contratos, unidades, usuários e aceite de medição.</p>
       </header>
 
       <form
@@ -16,7 +16,7 @@ export default function NewCustomerPage() {
         }}
         className="form-card"
       >
-        <Field name="name" label="Razao social" required />
+        <Field name="name" label="Razão social" required />
         <Field name="document" label="CNPJ" placeholder="00.000.000/0000-00" />
         <Field name="contact_name" label="Nome do contato" />
         <Field name="contact_email" label="E-mail" type="email" />

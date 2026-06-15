@@ -22,7 +22,7 @@ export async function login(form: FormData) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent("Login invalido ou usuario sem perfil ativo.")}&next=${encodeURIComponent(next)}`);
+    redirect(`/login?error=${encodeURIComponent("Login inválido ou usuário sem perfil ativo.")}&next=${encodeURIComponent(next)}`);
   }
 
   const { data: profile } = await supabase
@@ -33,7 +33,7 @@ export async function login(form: FormData) {
 
   if (!profile?.active) {
     await supabase.auth.signOut();
-    redirect(`/login?error=${encodeURIComponent("Usuario autenticado, mas sem perfil ativo ou sem claims de tenant. Verifique users_profile e Auth Hook.")}&next=${encodeURIComponent(next)}`);
+    redirect(`/login?error=${encodeURIComponent("Usuário autenticado, mas sem perfil ativo ou sem claims de tenant. Verifique users_profile e Auth Hook.")}&next=${encodeURIComponent(next)}`);
   }
 
   revalidatePath("/", "layout");

@@ -143,7 +143,8 @@ create index pmoc_alerts_open_idx
 -- =====================================================================
 -- View: v_pmoc_compliance - resumo por PMOC
 -- =====================================================================
-create or replace view public.v_pmoc_compliance as
+create or replace view public.v_pmoc_compliance
+with (security_invoker = true) as
 select
   pp.id as pmoc_plan_id,
   pp.tenant_id,

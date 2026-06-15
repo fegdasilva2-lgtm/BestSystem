@@ -1,13 +1,13 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { defaultBlocks } from "./actions";
+import { defaultBlocks } from "./defaults";
 import RgmForm from "./form";
 
 export default async function RgmPage() {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    redirect("/login?error=Sessao invalida&next=/admin/rgm");
+    redirect("/login?error=Sessão inválida&next=/admin/rgm");
   }
 
   const supabase = await createSupabaseServer();
@@ -28,11 +28,11 @@ export default async function RgmPage() {
   return (
     <main className="page-shell">
       <header className="page-header">
-        <p className="eyebrow">RGM configuravel</p>
-        <h1>Relatorio de Gestao Mensal.</h1>
+        <p className="eyebrow">RGM configurável</p>
+        <h1>Relatório de Gestão Mensal.</h1>
         <p>
-          O RGM e o entregavel recorrente mais importante para o cliente. Configure os blocos por
-          contrato, gere a previa do mes e arquive a versao imutavel apos o aceite.
+          O RGM é o entregável recorrente mais importante para o cliente. Configure os blocos por
+          contrato, gere a prévia do mês e arquive a versão imutável após o aceite.
         </p>
       </header>
 
@@ -46,9 +46,9 @@ export default async function RgmPage() {
         <div>
           <p className="eyebrow" style={{ color: "#ffe3d4" }}>Diferencial brasileiro</p>
           <strong>
-            No Fracttal e Infraspeak o RGM e montado a mao por cliente. Aqui ele vira um report
-            builder configuravel por contrato, com identidade visual aplicada e versao imutavel
-            apos aceite.
+            No Fracttal e Infraspeak o RGM é montado à mão por cliente. Aqui ele vira um report
+            builder configurável por contrato, com identidade visual aplicada e versão imutável
+            após aceite.
           </strong>
         </div>
       </section>

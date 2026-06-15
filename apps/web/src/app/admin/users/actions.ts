@@ -31,20 +31,20 @@ function fail(message: string): never {
 
 export async function createUserProfile(form: FormData) {
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) fail("Login com perfil ativo e obrigatorio.");
-  if (!canManageUsers(profile.role)) fail("Seu perfil nao pode criar usuarios.");
+  if (!profile?.active || !profile.tenant) fail("Login com perfil ativo é obrigatório.");
+  if (!canManageUsers(profile.role)) fail("Seu perfil não pode criar usuários.");
 
   const name = String(form.get("name") || "").trim();
   const email = String(form.get("email") || "").trim().toLowerCase();
   const password = String(form.get("password") || "");
   const role = String(form.get("role") || "solicitante") as UserRole;
 
-  if (!name) fail("Nome e obrigatorio.");
-  if (!email) fail("E-mail e obrigatorio.");
-  if (password.length < 8) fail("Senha temporaria deve ter pelo menos 8 caracteres.");
-  if (!roles.includes(role)) fail("Perfil invalido.");
+  if (!name) fail("Nome é obrigatório.");
+  if (!email) fail("E-mail é obrigatório.");
+  if (password.length < 8) fail("Senha temporária deve ter pelo menos 8 caracteres.");
+  if (!roles.includes(role)) fail("Perfil inválido.");
   if (role === "admin_org" && profile.role !== "super_admin_saas" && profile.role !== "admin_org") {
-    fail("Somente admin da organizacao pode criar outro admin.");
+    fail("Somente admin da organização pode criar outro admin.");
   }
 
   const admin = createSupabaseAdmin();
@@ -61,7 +61,7 @@ export async function createUserProfile(form: FormData) {
   });
 
   if (authError || !created.user) {
-    fail(authError?.message ?? "Nao foi possivel criar o usuario no Auth.");
+    fail(authError?.message ?? "Não foi possível criar o usuário no Auth.");
   }
 
   const { error: profileError } = await admin.from("users_profile").insert({

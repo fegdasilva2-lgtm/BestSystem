@@ -1,6 +1,39 @@
 import { login } from "@/app/auth/actions";
-import { getSessionProfile } from "@/lib/auth";
+import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { redirect } from "next/navigation";
+
+const accessLanes = [
+  {
+    label: "Gestão",
+    total: "3 perfis",
+    detail: "Administra tenant, contratos, cadastros e governança da operação.",
+    roles: ["super_admin_saas", "admin_org", "gestor_facilities"] satisfies UserRole[]
+  },
+  {
+    label: "Operação",
+    total: "5 perfis",
+    detail: "Planeja, supervisiona e executa OS, PMOC, estoque e rotina de campo.",
+    roles: ["planejador", "supervisor", "tecnico", "auxiliar", "almoxarife"] satisfies UserRole[]
+  },
+  {
+    label: "Backoffice",
+    total: "3 perfis",
+    detail: "Acompanha comercial, financeiro, auditoria, medição e evidências.",
+    roles: ["comercial", "financeiro", "auditor"] satisfies UserRole[]
+  },
+  {
+    label: "Cliente",
+    total: "3 perfis",
+    detail: "Abre chamados, aprova entregas e acompanha fornecedores autorizados.",
+    roles: ["cliente_gestor", "solicitante", "fornecedor"] satisfies UserRole[]
+  }
+];
+
+const trustSignals = [
+  { title: "Perfil ativo", detail: "Acesso aplicado conforme o cargo." },
+  { title: "Tenant validado", detail: "Cada empresa em ambiente isolado." },
+  { title: "Isolamento por RLS", detail: "Segurança no banco, não só na tela." }
+];
 
 export default async function LoginPage({
   searchParams
@@ -15,18 +48,34 @@ export default async function LoginPage({
   }
 
   return (
-    <main className="page-shell narrow">
-      <header className="page-header auth-header">
-        <p className="eyebrow">Acesso seguro</p>
-        <h1>Entrar no PredialOps.</h1>
-        <p>
-          Use um usuario criado no Supabase Auth e vinculado a `users_profile` para receber
-          `tenant_id` e perfil no JWT.
-        </p>
-      </header>
+    <main className="login-shell">
+      <section className="login-hero" aria-labelledby="login-title">
+        <div className="login-copy">
+          <p className="eyebrow">Acesso PredialOps</p>
+          <h1 id="login-title">Central de manutenção, contratos e campo.</h1>
+          <p>
+            Entre com seu usuário corporativo. O PredialOps reconhece o tenant e libera a
+            experiência correta para cada perfil.
+          </p>
+          <ul className="trust-strip" aria-label="Controles de acesso">
+            {trustSignals.map((signal) => (
+              <li key={signal.title}>
+                <span className="trust-dot" aria-hidden="true" />
+                <span>
+                  <strong>{signal.title}</strong>
+                  <small>{signal.detail}</small>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <section className="auth-layout">
-        <form action={login} className="form-card auth-card">
+        <form action={login} className="form-card auth-card login-card">
+          <div className="login-card-head">
+            <p className="eyebrow">Entrar</p>
+            <h2>Acesse sua operação</h2>
+            <p className="muted">Seu perfil é aplicado automaticamente após o login.</p>
+          </div>
           {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
           {searchParams?.created ? <p className="status-pill">{searchParams.created}</p> : null}
           <input name="next" type="hidden" value={next} />
@@ -36,22 +85,39 @@ export default async function LoginPage({
           </label>
           <label className="field">
             <span>Senha</span>
-            <input name="password" type="password" autoComplete="current-password" required placeholder="Senha temporaria" />
+            <input name="password" type="password" autoComplete="current-password" required placeholder="Senha temporária" />
           </label>
           <div className="form-actions">
             <a className="button-link" href="/setup">Primeiro acesso</a>
             <button type="submit" className="primary-button">Entrar</button>
           </div>
         </form>
+      </section>
 
-        <aside className="glass-card auth-note">
-          <p className="eyebrow">Perfis</p>
-          <h2>RLS depende do perfil ativo</h2>
-          <p className="muted">
-            O login so libera dados quando o usuario tem registro em `users_profile`, tenant ativo
-            e Auth Hook configurado para injetar os claims.
-          </p>
-        </aside>
+      <section className="role-matrix" aria-labelledby="roles-title">
+        <div className="role-matrix-head">
+          <div>
+            <p className="eyebrow">Perfis e usuários</p>
+            <h2 id="roles-title">Tipos de acesso disponíveis</h2>
+          </div>
+          <span className="status-pill">14 perfis</span>
+        </div>
+        <div className="role-lanes">
+          {accessLanes.map((lane) => (
+            <article className="role-lane" key={lane.label}>
+              <div className="role-lane-head">
+                <span>{lane.label}</span>
+                <strong>{lane.total}</strong>
+              </div>
+              <p>{lane.detail}</p>
+              <ul>
+                {lane.roles.map((role) => (
+                  <li key={role}>{roleLabels[role]}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
       </section>
     </main>
   );

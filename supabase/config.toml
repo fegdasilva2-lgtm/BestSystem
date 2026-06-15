@@ -1,42 +1,58 @@
-{
-  "project_id": "predialops-homolog",
-  "region": "sa-east-1",
-  "entrypoint": "./apps/mobile/index.html",
-  "auth": {
-    "site_url": "https://homolog.predialops.app.br",
-    "additional_redirect_urls": [
-      "https://homolog.predialops.app.br/portal",
-      "https://homolog.predialops.app.br/portal/solicitante"
-    ],
-    "jwt_expiry": 3600,
-    "enable_signup": false,
-    "enable_anonymous_sign_ins": false,
-    "mfa": {
-      "max_enrolled_factors": 5
-    }
-  },
-  "db": {
-    "pool_size": 15,
-    "shadow_pool_size": 5
-  },
-  "storage": {
-    "file_size_limit": "20MiB",
-    "image_transformation": { "enabled": false }
-  },
-  "realtime": {
-    "broadcast": { "self": false },
-    "presence": { "enabled": true },
-    "private_channels": true
-  },
-  "edge_functions": {
-    "verify_jwt": true
-  },
-  "auth": {
-    "hook": {
-      "custom_access_token": {
-        "uri": "pg-functions://postgres/public/custom_access_token_hook",
-        "enabled": true
-      }
-    }
-  }
-}
+project_id = "saunmtbsjwgvcwqfxhzb"
+
+[auth]
+enabled = true
+site_url = "https://homolog.predialops.app.br"
+additional_redirect_urls = [
+  "https://homolog.predialops.app.br/portal",
+  "https://homolog.predialops.app.br/portal/solicitante",
+  "http://localhost:3000",
+  "http://localhost:3000/login"
+]
+jwt_expiry = 3600
+enable_signup = false
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"
+
+[auth.mfa]
+max_enrolled_factors = 5
+
+[db]
+major_version = 15
+
+[db.pooler]
+enabled = true
+default_pool_size = 15
+
+[db.seed]
+enabled = true
+sql_paths = []
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+file_size_limit = "20MiB"
+
+[edge_runtime]
+enabled = true
+
+[functions.custom-access-token]
+enabled = true
+verify_jwt = false
+import_map = "./functions/import_map.json"
+entrypoint = "./functions/custom-access-token/index.ts"
+
+[functions.rls-isolation-test]
+enabled = true
+verify_jwt = false
+import_map = "./functions/import_map.json"
+entrypoint = "./functions/rls-isolation-test/index.ts"

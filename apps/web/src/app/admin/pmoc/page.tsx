@@ -6,7 +6,7 @@ import PmocClient from "./client";
 export default async function PmocPage() {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
-    redirect("/login?error=Sessao invalida&next=/admin/pmoc");
+    redirect("/login?error=Sessão inválida&next=/admin/pmoc");
   }
   if (!["admin_org", "gestor_facilities", "supervisor", "tecnico", "auditor"].includes(profile.role)) {
     redirect("/admin?error=PMOC restrito");
@@ -27,12 +27,12 @@ export default async function PmocPage() {
     <main className="page-shell">
       <header className="page-header">
         <p className="eyebrow">PMOC</p>
-        <h1>Plano de Manutencao, Operacao e Controle.</h1>
+        <h1>Plano de Manutenção, Operação e Controle.</h1>
         <p>
-          Lei 13.589/2018 - obrigatorio para sistemas de climatizacao.
-          Cada plano vincula um responsavel tecnico (RT) com CREA + ART,
+          Lei 13.589/2018 - obrigatório para sistemas de climatização.
+          Cada plano vincula um responsável técnico (RT) com CREA + ART,
           gera automaticamente as atividades por ativo HVAC e monitora
-          conformidade regulatoria continua.
+          conformidade regulatória contínua.
         </p>
       </header>
 

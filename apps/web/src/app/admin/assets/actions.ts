@@ -9,12 +9,12 @@ export interface CreateAssetResult { id?: string; error?: string; }
 export async function createAsset(form: FormData): Promise<CreateAssetResult> {
   const supabase = await createSupabaseServer();
   const profile = await getSessionProfile();
-  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo e obrigatorio." };
+  if (!profile?.active || !profile.tenant) return { error: "Login com perfil ativo é obrigatório." };
 
   const siteId = String(form.get("site_id") || "");
   if (!siteId) return { error: "Selecione o site do ativo." };
 
-  // Localizacao: ou usa a existente, ou cria um "ambiente" simples
+  // Localização: ou usa a existente, ou cria um "ambiente" simples
   let locationId = String(form.get("location_id") || "");
   const newLocation = String(form.get("new_location") || "").trim();
 
@@ -32,7 +32,7 @@ export async function createAsset(form: FormData): Promise<CreateAssetResult> {
     }
   }
 
-  if (!locationId) return { error: "Informe a localizacao do ativo." };
+  if (!locationId) return { error: "Informe a localização do ativo." };
 
   const payload = {
     tenant_id: profile.tenant.id,
@@ -49,8 +49,8 @@ export async function createAsset(form: FormData): Promise<CreateAssetResult> {
     warranty_until: String(form.get("warranty_until") || "") || null
   };
 
-  if (!payload.code) return { error: "Codigo do ativo e obrigatorio." };
-  if (!payload.name) return { error: "Nome do ativo e obrigatorio." };
+  if (!payload.code) return { error: "Código do ativo é obrigatório." };
+  if (!payload.name) return { error: "Nome do ativo é obrigatório." };
 
   const { data, error } = await supabase.from("assets").insert(payload).select("id").single();
   if (error) return { error: error.message };
