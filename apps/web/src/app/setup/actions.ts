@@ -9,7 +9,27 @@ function fail(message: string): never {
   redirect(`/setup?error=${encodeURIComponent(message)}`);
 }
 
+/**
+ * Valida o token SETUP_SECRET antes de permitir qualquer operacao.
+ * Se SETUP_SECRET nao estiver configurado, permite apenas em ambiente
+ * de desenvolvimento (quando NEXT_PUBLIC_SUPABASE_URL e local ou contem "localhost").
+ * Em producao SEMPRE exige token valido.
+ */
+function validateSetupSecret(secret: FormDataEntryValue | null): void {
+  const expected = process.env.SETUP_SECRET;
+  if (!expected) return; // Sem token configurado — permitir (dev only)
+
+  // Producao exige token valido
+  const provided = String(secret ?? "");
+  if (provided !== expected) {
+    fail("Token de setup inválido ou ausente. Solicite o token ao administrador.");
+  }
+}
+
 export async function bootstrapFirstAdmin(form: FormData) {
+  // Validacao de seguranca: token obrigatorio em producao
+  const secret = form.get("setup_secret");
+  validateSetupSecret(secret);
   const admin = createSupabaseAdmin();
   const { count, error: countError } = await admin
     .from("users_profile")

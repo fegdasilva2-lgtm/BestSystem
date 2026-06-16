@@ -21,7 +21,13 @@ export default async function SetupPage({
     setupError = err instanceof Error ? err.message : "Configuração de Supabase indisponível.";
   }
 
-  if (hasUsers) redirect("/login");
+  const setupSecret = process.env.SETUP_SECRET;
+  if (setupSecret) {
+    const provided = searchParams?.secret;
+    if (provided !== setupSecret) redirect("/login");
+  } else if (hasUsers) {
+    redirect("/login");
+  }
 
   return (
     <main className="page-shell narrow">
@@ -38,6 +44,7 @@ export default async function SetupPage({
         <form action={bootstrapFirstAdmin} className="form-card auth-card">
           {setupError ? <p className="form-error">{setupError}</p> : null}
           {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
+          <input type="hidden" name="setup_secret" value={searchParams?.secret ?? ""} />
           <label className="field">
             <span>Nome</span>
             <input name="name" required placeholder="Administrador PredialOps" />
@@ -48,7 +55,7 @@ export default async function SetupPage({
           </label>
           <label className="field">
             <span>Senha</span>
-            <input name="password" type="password" required minLength={8} placeholder="PredialOps!2026" />
+            <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
           </label>
           <div className="form-actions">
             <button className="primary-button" type="submit" disabled={Boolean(setupError)}>
@@ -59,9 +66,13 @@ export default async function SetupPage({
 
         <aside className="glass-card auth-note">
           <p className="eyebrow">Segurança</p>
-          <h2>Bloqueio automático</h2>
+          <h2>Proteção por token</h2>
           <p className="muted">
-            Quando o primeiro <code>users_profile</code> existir, esta rota redireciona para <code>/login</code> e não permite novo bootstrap.
+            O acesso a esta tela requer o token <code>SETUP_SECRET</code> configurado
+            na variável de ambiente. Sem ele, a rota redireciona para login.
+          </p>
+          <p className="muted">
+            Após o primeiro administrador criado, novos acessos são bloqueados.
           </p>
         </aside>
       </section>
