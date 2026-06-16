@@ -43,13 +43,35 @@ export async function proxy(request: NextRequest) {
   const protectedRoute = request.nextUrl.pathname.startsWith("/portal")
     || request.nextUrl.pathname.startsWith("/admin");
 
-  if (!user && protectedRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    // Sanitiza o next antes de passar adiante — evita open redirect
-    const nextParam = request.nextUrl.searchParams.get("next");
-    url.searchParams.set("next", sanitizeNextParam(nextParam));
-    return NextResponse.redirect(url);
+  if (!protectedRoute) return response;
+
+  const loginUrl = request.nextUrl.clone();
+  loginUrl.pathname = "/login";
+  // Sanitiza o next antes de passar adiante — evita open redirect
+  const nextParam = request.nextUrl.searchParams.get("next") ?? request.nextUrl.pathname + request.nextUrl.search;
+  loginUrl.searchParams.set("next", sanitizeNextParam(nextParam));
+
+  if (!user) {
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Revogacao defensiva: se o usuario foi desativado em users_profile,
+  // bloqueia acesso mesmo que o JWT antigo ainda nao tenha expirado.
+  const { data: profile } = await supabase
+    .from("users_profile")
+    .select("active")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile?.active) {
+    loginUrl.searchParams.set("error", "Sessão expirada ou usuário desativado.");
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    for (const cookie of request.cookies.getAll()) {
+      if (cookie.name.startsWith("sb-")) {
+        redirectResponse.cookies.set(cookie.name, "", { maxAge: 0, path: "/" });
+      }
+    }
+    return redirectResponse;
   }
 
   return response;
