@@ -1,39 +1,63 @@
 import { login } from "@/app/auth/actions";
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import LoginForm from "./login-form";
 
 const accessLanes = [
   {
     label: "Gestão",
     total: "3 perfis",
     detail: "Administra tenant, contratos, cadastros e governança da operação.",
+    color: "forest",
     roles: ["super_admin_saas", "admin_org", "gestor_facilities"] satisfies UserRole[]
   },
   {
     label: "Operação",
     total: "5 perfis",
     detail: "Planeja, supervisiona e executa OS, PMOC, estoque e rotina de campo.",
+    color: "clay",
     roles: ["planejador", "supervisor", "tecnico", "auxiliar", "almoxarife"] satisfies UserRole[]
   },
   {
     label: "Backoffice",
     total: "3 perfis",
     detail: "Acompanha comercial, financeiro, auditoria, medição e evidências.",
+    color: "amber",
     roles: ["comercial", "financeiro", "auditor"] satisfies UserRole[]
   },
   {
     label: "Cliente",
     total: "3 perfis",
     detail: "Abre chamados, aprova entregas e acompanha fornecedores autorizados.",
+    color: "steel",
     roles: ["cliente_gestor", "solicitante", "fornecedor"] satisfies UserRole[]
   }
 ];
 
 const trustSignals = [
-  { title: "Perfil ativo", detail: "Acesso aplicado conforme o cargo." },
-  { title: "Tenant validado", detail: "Cada empresa em ambiente isolado." },
-  { title: "Isolamento por RLS", detail: "Segurança no banco, não só na tela." }
+  {
+    icon: "🔐",
+    title: "Perfil ativo",
+    detail: "Acesso aplicado conforme o cargo — cada perfil vê só o que precisa."
+  },
+  {
+    icon: "🏢",
+    title: "Tenant validado",
+    detail: "Cada empresa opera em ambiente isolado com dados próprios."
+  },
+  {
+    icon: "🛡️",
+    title: "Isolamento por RLS",
+    detail: "Segurança no banco de dados, não só na interface."
+  }
 ];
+
+const laneColors: Record<string, string> = {
+  forest: "#143630",
+  clay: "#dc653d",
+  amber: "#c99232",
+  steel: "#587482"
+};
 
 export default async function LoginPage({
   searchParams
@@ -49,14 +73,16 @@ export default async function LoginPage({
 
   return (
     <main className="login-shell">
+      {/* ── Hero + Form ── */}
       <section className="login-hero" aria-labelledby="login-title">
         <div className="login-copy">
           <p className="eyebrow">Acesso PredialOps</p>
-          <h1 id="login-title">Central de manutenção, contratos e campo.</h1>
+          <h1 id="login-title">Gestão predial com contrato, campo e aceite no mesmo fluxo.</h1>
           <p>
             Entre com seu usuário corporativo. O PredialOps reconhece o tenant e libera a
-            experiência correta para cada perfil.
+            experiência correta para cada perfil de acesso.
           </p>
+
           <ul className="trust-strip" aria-label="Controles de acesso">
             {trustSignals.map((signal) => (
               <li key={signal.title}>
@@ -70,41 +96,54 @@ export default async function LoginPage({
           </ul>
         </div>
 
-        <form action={login} className="form-card auth-card login-card">
+        <div className="login-card">
           <div className="login-card-head">
             <p className="eyebrow">Entrar</p>
             <h2>Acesse sua operação</h2>
             <p className="muted">Seu perfil é aplicado automaticamente após o login.</p>
           </div>
-          {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
-          {searchParams?.created ? <p className="status-pill">{searchParams.created}</p> : null}
-          <input name="next" type="hidden" value={next} />
-          <label className="field">
-            <span>E-mail</span>
-            <input name="email" type="email" autoComplete="email" required placeholder="camila@imcfacilities.com.br" />
-          </label>
-          <label className="field">
-            <span>Senha</span>
-            <input name="password" type="password" autoComplete="current-password" required placeholder="Senha temporária" />
-          </label>
-          <div className="form-actions">
-            <a className="button-link" href="/setup">Primeiro acesso</a>
-            <button type="submit" className="primary-button">Entrar</button>
-          </div>
-        </form>
+
+          {searchParams?.error ? (
+            <div className="form-error" role="alert">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              {searchParams.error}
+            </div>
+          ) : null}
+          {searchParams?.created ? (
+            <div className="status-pill" role="status">
+              ✓ {searchParams.created}
+            </div>
+          ) : null}
+
+          <LoginForm next={next} />
+        </div>
       </section>
 
+      {/* ── Matriz de Perfis ── */}
       <section className="role-matrix" aria-labelledby="roles-title">
         <div className="role-matrix-head">
           <div>
-            <p className="eyebrow">Perfis e usuários</p>
-            <h2 id="roles-title">Tipos de acesso disponíveis</h2>
+            <p className="eyebrow">Perfis e acessos</p>
+            <h2 id="roles-title">14 perfis organizados em 4 lanes</h2>
+            <p className="muted" style={{ marginTop: 8, fontSize: 14 }}>
+              Cada perfil tem permissões específicas e rotas dedicadas. O isolamento é garantido por RLS no banco.
+            </p>
           </div>
           <span className="status-pill">14 perfis</span>
         </div>
+
         <div className="role-lanes">
           {accessLanes.map((lane) => (
             <article className="role-lane" key={lane.label}>
+              <div
+                className="role-lane-accent"
+                style={{ background: laneColors[lane.color] }}
+                aria-hidden="true"
+              />
               <div className="role-lane-head">
                 <span>{lane.label}</span>
                 <strong>{lane.total}</strong>
@@ -112,12 +151,42 @@ export default async function LoginPage({
               <p>{lane.detail}</p>
               <ul>
                 {lane.roles.map((role) => (
-                  <li key={role}>{roleLabels[role]}</li>
+                  <li key={role}>
+                    <span className="role-dot" style={{ background: laneColors[lane.color] }} aria-hidden="true" />
+                    {roleLabels[role]}
+                  </li>
                 ))}
               </ul>
             </article>
           ))}
         </div>
+      </section>
+
+      {/* ── Feature highlights ── */}
+      <section className="feature-strip" aria-label="Destaques do produto">
+        {[
+          {
+            eyebrow: "Contratos",
+            title: "Gestão centralizada",
+            detail: "Clientes, sites, ativos, SLA, medição e RGM orbitam o contrato como entidade central."
+          },
+          {
+            eyebrow: "RLS",
+            title: "Multi-tenant seguro",
+            detail: "O isolamento não depende apenas de filtros no frontend — o banco aplica as políticas."
+          },
+          {
+            eyebrow: "PWA",
+            title: "Offline em campo",
+            detail: "Outbox, evidências fotográficas e sincronização incremental para execução offline."
+          }
+        ].map((f) => (
+          <article className="feature-card" key={f.title}>
+            <p className="eyebrow">{f.eyebrow}</p>
+            <h3>{f.title}</h3>
+            <p className="muted">{f.detail}</p>
+          </article>
+        ))}
       </section>
     </main>
   );
