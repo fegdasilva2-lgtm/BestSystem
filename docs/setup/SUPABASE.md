@@ -71,11 +71,19 @@ order by role;
 
 Usuarios de teste de gestao no tenant `IMC Facilities`:
 
-| E-mail | Perfil | Senha |
-|---|---|---|
-| `superadmin.gestao@predialops.test` | Super admin SaaS | `PredialOps!2026` |
-| `admin.gestao@predialops.test` | Administrador da empresa | `PredialOps!2026` |
-| `gestor.gestao@predialops.test` | Gestor de facilities | `PredialOps!2026` |
+| E-mail | Perfil |
+|---|---|
+| `superadmin.gestao@predialops.test` | Super admin SaaS |
+| `admin.gestao@predialops.test` | Administrador da empresa |
+| `gestor.gestao@predialops.test` | Gestor de facilities |
+
+A senha seed **nao fica no repositorio**. Antes de aplicar `0005_seed_sandbox.sql`, defina uma senha temporaria fora do codigo:
+
+```sql
+select set_config('app.settings.seed_password', '<senha-temporaria-forte>', false);
+```
+
+Use senha unica por ambiente e force troca no primeiro acesso.
 
 ## 3. Gerar tipos TypeScript
 

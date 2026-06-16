@@ -2,7 +2,8 @@
 -- Os dados abaixo NAO vao para producao. Apos o piloto, este arquivo
 -- e substituido por um wizard de onboarding assistido.
 
--- Senha de todos os usuarios seed: 'PredialOps!2026' (forcar troca no 1o login)
+-- Usuarios seed exigem senha definida fora do codigo via:
+--   select set_config('app.settings.seed_password', '<senha-forte>', false);
 
 insert into public.tenants (id, name, slug, plan, status) values
   ('00000000-0000-0000-0000-000000000001', 'IMC Facilities',  'imc-facilities',  'business',    'ativo'),
@@ -15,17 +16,22 @@ on conflict do nothing;
 --   superadmin.gestao@predialops.test  -> Super admin SaaS
 --   admin.gestao@predialops.test       -> Administrador da empresa
 --   gestor.gestao@predialops.test      -> Gestor de facilities
--- Senha de todos: 'PredialOps!2026'
+-- Credenciais:
+--   Defina app.settings.seed_password antes de aplicar este seed.
 --
 -- Observacao: este seed escreve em auth.users apenas para sandbox/local/UAT.
 -- Para ambientes produtivos, criar usuarios via Supabase Auth Admin API.
 do $$
 declare
   seed_tenant_id uuid := '00000000-0000-0000-0000-000000000001';
-  seed_password text := 'PredialOps!2026';
+  seed_password text := nullif(current_setting('app.settings.seed_password', true), '');
   seed_user record;
   auth_user_id uuid;
 begin
+  if seed_password is null then
+    raise exception 'app.settings.seed_password deve ser definido antes de aplicar 0005_seed_sandbox.sql';
+  end if;
+
   for seed_user in
     select *
     from (

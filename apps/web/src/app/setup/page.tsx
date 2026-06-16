@@ -48,7 +48,7 @@ export default async function SetupPage({
           </label>
           <label className="field">
             <span>Senha</span>
-            <input name="password" type="password" required minLength={8} placeholder="PredialOps!2026" />
+            <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
           </label>
           <div className="form-actions">
             <button className="primary-button" type="submit" disabled={Boolean(setupError)}>

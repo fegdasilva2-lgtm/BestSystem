@@ -139,7 +139,7 @@ export default async function UsersPage({
             </label>
             <label className="field">
               <span>Senha temporária</span>
-              <input name="password" type="password" required minLength={8} placeholder="PredialOps!2026" />
+              <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
             </label>
             <label className="field">
               <span>Perfil</span>
