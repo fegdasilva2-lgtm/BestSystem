@@ -26,22 +26,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span className="brand-mark" aria-hidden="true">P</span>
               <span className="brand-text">
                 <strong>PredialOps</strong>
-                <span>Contract Ops Brasil</span>
+                <span>Facilities Brasil</span>
               </span>
             </a>
-            <div className="rail-links">
-              <a href="/admin">Operação</a>
-              <a href="/admin/users">Acessos</a>
-              <a href="/admin/contracts/new">Contrato</a>
-              <a href="/admin/assets/new">Ativo</a>
-              <a href="/admin/rgm">RGM</a>
+            <div className="rail-links" aria-label="Módulos">
+              <a href="/admin"><span>Operação</span></a>
+              <a href="/admin/users"><span>Acessos</span></a>
+              <a href="/admin/contracts/new"><span>Contrato</span></a>
+              <a href="/admin/assets/new"><span>Ativo</span></a>
+              <a href="/admin/rgm"><span>RGM</span></a>
             </div>
             <div className="user-rail">
               {profile?.active && profile.tenant ? (
                 <>
                   <a className="user-pill" href="/admin/users">
-                    <span>{profile.name}</span>
-                    <small>{roleLabels[profile.role]} - {profile.tenant.name}</small>
+                    <span className="user-status" aria-hidden="true" />
+                    <span className="user-pill-copy">
+                      <span>{profile.name}</span>
+                      <small>{roleLabels[profile.role]} - {profile.tenant.name}</small>
+                    </span>
                   </a>
                   <form action={logout}>
                     <button className="ghost-button compact" type="submit">Sair</button>
