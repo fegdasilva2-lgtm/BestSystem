@@ -1,4 +1,3 @@
-import { login } from "@/app/auth/actions";
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import LoginForm from "./login-form";
@@ -36,20 +35,23 @@ const accessLanes = [
 
 const trustSignals = [
   {
-    icon: "🔐",
     title: "Perfil ativo",
-    detail: "Acesso aplicado conforme o cargo — cada perfil vê só o que precisa."
+    detail: "Permissões por cargo e rotas dedicadas."
   },
   {
-    icon: "🏢",
     title: "Tenant validado",
-    detail: "Cada empresa opera em ambiente isolado com dados próprios."
+    detail: "Empresa, contratos e equipes isolados."
   },
   {
-    icon: "🛡️",
     title: "Isolamento por RLS",
-    detail: "Segurança no banco de dados, não só na interface."
+    detail: "Políticas aplicadas direto no banco."
   }
+];
+
+const operationSignals = [
+  { label: "OS em campo", value: "128", tone: "ok" },
+  { label: "PMOC no prazo", value: "94%", tone: "amber" },
+  { label: "RGMs em aceite", value: "18", tone: "steel" }
 ];
 
 const laneColors: Record<string, string> = {
@@ -73,7 +75,6 @@ export default async function LoginPage({
 
   return (
     <main className="login-shell">
-      {/* ── Hero + Form ── */}
       <section className="login-hero" aria-labelledby="login-title">
         <div className="login-copy">
           <p className="eyebrow">Acesso PredialOps</p>
@@ -94,6 +95,21 @@ export default async function LoginPage({
               </li>
             ))}
           </ul>
+
+          <div className="login-ops-panel" aria-label="Resumo operacional">
+            <div className="ops-panel-head">
+              <span>Operação hoje</span>
+              <strong>sa-east-1</strong>
+            </div>
+            <div className="ops-metrics">
+              {operationSignals.map((signal) => (
+                <span className={`ops-metric ${signal.tone}`} key={signal.label}>
+                  <strong>{signal.value}</strong>
+                  <small>{signal.label}</small>
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="login-card">
@@ -115,7 +131,7 @@ export default async function LoginPage({
           ) : null}
           {searchParams?.created ? (
             <div className="status-pill" role="status">
-              ✓ {searchParams.created}
+              Criado: {searchParams.created}
             </div>
           ) : null}
 
@@ -123,7 +139,6 @@ export default async function LoginPage({
         </div>
       </section>
 
-      {/* ── Matriz de Perfis ── */}
       <section className="role-matrix" aria-labelledby="roles-title">
         <div className="role-matrix-head">
           <div>
@@ -162,7 +177,6 @@ export default async function LoginPage({
         </div>
       </section>
 
-      {/* ── Feature highlights ── */}
       <section className="feature-strip" aria-label="Destaques do produto">
         {[
           {
