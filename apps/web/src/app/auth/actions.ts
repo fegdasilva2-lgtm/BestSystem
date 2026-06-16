@@ -4,9 +4,30 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-function safeNext(value: FormDataEntryValue | null) {
-  const next = String(value || "/admin");
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/admin";
+/**
+ * Valida o parametro `next` para prevenir open redirect.
+ * Apenas caminhos internos (relativos) sao permitidos.
+ * Bloqueia:
+ *   - //evil.com         (protocol-relative URL)
+ *   - https://evil.com   (absolute URL)
+ *   - /admin//evil.com   (path com有机会域名碰瓷)
+ *   - /admin/../evil.com (path traversal)
+ */
+function safeNext(value: FormDataEntryValue | null): string {
+  const raw = String(value || "/admin");
+  try {
+    const url = new URL(raw, "http://localhost");
+    // Se new URL() resolve para um hostname diferente de localhost,
+    // e uma URL absoluta (protocol-relative ou nao) — bloquear.
+    if (url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
+      return "/admin";
+    }
+    return url.pathname + url.search;
+  } catch {
+    // Nao e uma URL valida — verificar se e apenas path simples
+    if (/^\/[^\/]*|^/$/.test(raw)) return raw;
+    return "/admin";
+  }
 }
 
 export async function login(form: FormData) {

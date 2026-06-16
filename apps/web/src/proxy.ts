@@ -2,6 +2,26 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Valida e sanitiza o parametro `next` para prevenir open redirect.
+ * Retorna apenas o pathname interno se valido, ou "/admin" como fallback.
+ */
+function sanitizeNextParam(rawNext: string | null): string {
+  const value = rawNext ?? "/admin";
+  try {
+    // new URL com base ficticia resolve URLs relativas e absolutas
+    const url = new URL(value, "http://localhost");
+    // So permite hostname localhost/127 (evita //evil.com e https://evil.com)
+    if (url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
+      return "/admin";
+    }
+    return url.pathname + url.search;
+  } catch {
+    // fallback seguro
+    return "/admin";
+  }
+}
+
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
   const supabase = createServerClient(
@@ -26,7 +46,9 @@ export async function proxy(request: NextRequest) {
   if (!user && protectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
+    // Sanitiza o next antes de passar adiante — evita open redirect
+    const nextParam = request.nextUrl.searchParams.get("next");
+    url.searchParams.set("next", sanitizeNextParam(nextParam));
     return NextResponse.redirect(url);
   }
 
