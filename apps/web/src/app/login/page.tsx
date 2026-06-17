@@ -75,8 +75,8 @@ export default async function LoginPage({
 
   return (
     <main className="login-shell">
-      <section className="login-hero" aria-labelledby="login-title">
-        <div className="login-copy">
+      <section className="login-hero animate-fade-in-up" aria-labelledby="login-title">
+        <div className="login-copy animate-slide-in-right" style={{ animationDelay: "80ms" }}>
           <p className="eyebrow">Acesso PredialOps</p>
           <h1 id="login-title">Gestão predial com contrato, campo e aceite no mesmo fluxo.</h1>
           <p>
@@ -112,7 +112,7 @@ export default async function LoginPage({
           </div>
         </div>
 
-        <div className="login-card">
+        <div className="login-card animate-fade-in-up" style={{ animationDelay: "160ms" }}>
           <div className="login-card-head">
             <p className="eyebrow">Entrar</p>
             <h2>Acesse sua operação</h2>
@@ -139,7 +139,7 @@ export default async function LoginPage({
         </div>
       </section>
 
-      <section className="role-matrix" aria-labelledby="roles-title">
+      <section className="role-matrix animate-fade-in-up" style={{ animationDelay: "240ms" }} aria-labelledby="roles-title">
         <div className="role-matrix-head">
           <div>
             <p className="eyebrow">Perfis e acessos</p>
@@ -177,7 +177,7 @@ export default async function LoginPage({
         </div>
       </section>
 
-      <section className="feature-strip" aria-label="Destaques do produto">
+      <section className="feature-strip stagger-children" style={{ animationDelay: "320ms" }} aria-label="Destaques do produto">
         {[
           {
             eyebrow: "Contratos",

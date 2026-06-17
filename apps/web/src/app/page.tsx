@@ -11,7 +11,7 @@ export default async function HomePage() {
 
   return (
     <main className="page-shell">
-      <header className="dashboard-hero">
+      <header className="dashboard-hero animate-fade-in-up">
         <div className="hero-copy">
           <div>
             <p className="eyebrow">Piloto sandbox em sa-east-1</p>
@@ -41,43 +41,43 @@ export default async function HomePage() {
         </aside>
       </header>
 
-      <section className="kpi-strip" aria-label="Indicadores do produto">
-        <article className="kpi-card">
+      <section className="kpi-strip stagger-children" aria-label="Indicadores do produto">
+        <article className="kpi-card animate-fade-in-up">
           <p className="eyebrow">Segurança</p>
           <strong>RLS</strong>
           <span>Isolamento por tenant no banco, não só na interface.</span>
         </article>
-        <article className="kpi-card">
+        <article className="kpi-card animate-fade-in-up">
           <p className="eyebrow">Campo</p>
           <strong>PWA</strong>
           <span>Outbox, evidências e sincronização incremental para execução offline.</span>
         </article>
-        <article className="kpi-card">
+        <article className="kpi-card animate-fade-in-up">
           <p className="eyebrow">Cliente</p>
           <strong>RGM</strong>
           <span>Relatório mensal configurável por contrato e arquivável após aceite.</span>
         </article>
       </section>
 
-      <section className="section-grid">
-        <article className="glass-card">
+      <section className="section-grid stagger-children">
+        <article className="glass-card hover-lift">
           <p className="eyebrow">Produto</p>
           <h2>Contrato como entidade central</h2>
           <p className="muted">Clientes, sites, ativos, SLA, medição e RGM orbitam o contrato.</p>
         </article>
-        <article className="glass-card">
+        <article className="glass-card hover-lift">
           <p className="eyebrow">Segurança</p>
           <h2>Multi-tenant com RLS</h2>
           <p className="muted">O isolamento não depende apenas de filtros no frontend.</p>
         </article>
-        <article className="glass-card">
+        <article className="glass-card hover-lift">
           <p className="eyebrow">Campo</p>
           <h2>Offline-first validado</h2>
           <p className="muted">A PWA demonstra outbox, upload de evidências e sync incremental.</p>
         </article>
       </section>
 
-      <section className="glass-card" style={{ marginTop: 18 }}>
+      <section className="glass-card hover-lift" style={{ marginTop: 18 }}>
         <p className="eyebrow">Supabase</p>
         <h2>Tenants provisionados</h2>
         {error ? (

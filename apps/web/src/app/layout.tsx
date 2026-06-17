@@ -30,10 +30,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </span>
             </a>
             <div className="rail-links" aria-label="Módulos">
-              <a href="/admin"><span>Operação</span></a>
+              <a href="/admin"><span>Painel</span></a>
+              <a href="/admin/contracts"><span>Contratos</span></a>
+              <a href="/admin/assets"><span>Ativos</span></a>
+              <a href="/admin/work-orders"><span>OS</span></a>
+              <a href="/admin/measurements"><span>Medições</span></a>
               <a href="/admin/users"><span>Acessos</span></a>
-              <a href="/admin/contracts/new"><span>Contrato</span></a>
-              <a href="/admin/assets/new"><span>Ativo</span></a>
               <a href="/admin/rgm"><span>RGM</span></a>
             </div>
             <div className="user-rail">
