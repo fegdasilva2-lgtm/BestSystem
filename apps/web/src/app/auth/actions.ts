@@ -25,12 +25,13 @@ function safeNext(value: FormDataEntryValue | null): string {
     return url.pathname + url.search;
   } catch {
     // Nao e uma URL valida — verificar se e apenas path simples
-    if (/^\/[^\/]*|^/$/.test(raw)) return raw;
+    if (/^\/[^\/]*$|^\/$/.test(raw)) return raw;
     return "/admin";
   }
 }
 
-export async function login(form: FormData) {
+export async function login(prev: unknown, form: FormData) {
+  // `prev` é o estado anterior (exigido pelo useActionState do React 19); não usado.
   const email = String(form.get("email") || "").trim().toLowerCase();
   const password = String(form.get("password") || "");
   const next = safeNext(form.get("next"));

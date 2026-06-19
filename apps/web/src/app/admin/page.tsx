@@ -42,10 +42,10 @@ export default function OnboardingHub() {
   ];
 
   const accentMap: Record<string, string> = {
-    forest: "var(--color-forest)",
-    clay: "var(--color-clay)",
-    amber: "var(--color-amber)",
-    steel: "var(--color-steel)"
+    forest: "var(--color-blueprint-ink)",
+    clay: "var(--color-safety-deep)",
+    amber: "var(--color-warn)",
+    steel: "var(--color-muted)"
   };
 
   return (

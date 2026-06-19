@@ -1,8 +1,34 @@
 import type { Metadata, Viewport } from "next";
+import { Archivo, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { logout } from "@/app/auth/actions";
 import { getSessionProfile, roleLabels } from "@/lib/auth";
 import { colors } from "@predialops/ds/tokens";
 import "./globals.css";
+
+// Tipografia "Prancheta de obra":
+// - Archivo (eixo wdth expandido) — display industrial para headings/brand
+// - Inter Tight — corpo neutro e apertado, leitura de tabela
+// - JetBrains Mono — códigos (OS-2026-0142), medições, datas NR
+const archivo = Archivo({
+  subsets: ["latin"],
+  variable: "--font-display",
+  axes: ["wdth"],
+  display: "swap"
+});
+
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap"
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "600", "700"],
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "PredialOps | Facilities SaaS",
@@ -11,14 +37,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: colors.forest
+  themeColor: colors.blueprintInk
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const profile = await getSessionProfile();
 
   return (
-    <html lang="pt-BR">
+    <html
+      lang="pt-BR"
+      className={`${archivo.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         <div className="app-chrome">
           <nav className="top-rail" aria-label="Navegação principal">
