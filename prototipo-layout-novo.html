@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PredialOps — Protótipo de Layout (Header Fixo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens do PredialOps (copiados de globals.css) ===== */
+:root {
+  --color-blueprint-ink: #0b1f3a;
+  --color-blueprint-deep: #0f2545;
+  --color-ink: var(--color-blueprint-ink);
+  --color-ink-soft: rgba(11, 31, 58, 0.68);
+  --color-muted: rgba(11, 31, 58, 0.62);
+  --color-concrete: #eceae4;
+  --color-paper: #f4f2ec;
+  --color-panel: #faf9f4;
+  --color-line: #c9c5ba;
+  --color-line-soft: rgba(11, 31, 58, 0.1);
+  --color-safety: #f2c12e;
+  --color-safety-deep: #8a6500;
+  --color-ok: #2f6b4f;
+  --color-danger: #c33024;
+  --color-warn: #8a6500;
+  --color-ok-wash: rgba(47, 107, 79, 0.12);
+  --color-ink-wash: rgba(11, 31, 58, 0.08);
+  --grad-brand: linear-gradient(135deg, var(--color-blueprint-ink), #1b3a6b 60%, var(--color-safety));
+  --shadow: 0 24px 70px -36px rgba(11, 31, 58, 0.34), 0 10px 26px -22px rgba(11, 31, 58, 0.24);
+  --shadow-soft: 0 16px 44px -32px rgba(11, 31, 58, 0.3), 0 1px 0 rgba(255, 255, 255, 0.72) inset;
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "Inter Tight", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { background: var(--color-concrete); }
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background:
+    radial-gradient(900px 420px at 18% -12%, rgba(11, 31, 58, 0.05), transparent 62%),
+    radial-gradient(680px 360px at 96% 4%, rgba(242, 193, 46, 0.08), transparent 58%),
+    linear-gradient(180deg, #f8f7f2 0, var(--color-concrete) 420px, var(--color-paper) 100%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, strong { font-family: var(--font-display); letter-spacing: -0.015em; }
+
+/* ===== HEADER FIXO (padrão RH Manager, adaptado para PredialOps) ===== */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(255, 253, 247, 0.92);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  backdrop-filter: saturate(160%) blur(20px);
+  border-bottom: 1px solid var(--color-line-soft);
+  box-shadow: 0 1px 3px rgba(11, 31, 58, 0.06);
+  z-index: 50;
+}
+
+.app-header-inner {
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Marca */
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fffdf7;
+  background: var(--grad-brand);
+  box-shadow: 0 12px 24px -14px rgba(15, 40, 35, 0.72), inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  font-family: Georgia, serif;
+  font-size: 22px;
+}
+
+.brand-text { line-height: 1.2; }
+.brand-text strong { display: block; font-size: 16px; font-weight: 700; color: var(--color-ink); letter-spacing: -0.01em; }
+.brand-text small { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-muted); }
+
+/* Menu Desktop */
+.nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-desktop::-webkit-scrollbar { display: none; }
+
+.nav-desktop a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--color-ink-soft);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.nav-desktop a:hover {
+  background: var(--color-ink-wash);
+  color: var(--color-ink);
+}
+
+.nav-desktop a.active {
+  background: rgba(242, 193, 46, 0.16);
+  color: var(--color-safety-deep);
+}
+
+.nav-desktop a svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+.nav-desktop a.active svg { opacity: 1; }
+
+/* Actions (lado direito) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid var(--color-line-soft);
+  text-decoration: none;
+  color: var(--color-ink);
+}
+
+.user-dot {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  background: var(--color-ok-wash);
+  position: relative;
+}
+.user-dot::after {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--color-ok);
+  box-shadow: 0 0 0 4px rgba(46, 125, 91, 0.13);
+}
+.user-pill-copy { line-height: 1.2; min-width: 0; }
+.user-pill-copy span { display: block; font-size: 13px; font-weight: 700; }
+.user-pill-copy small { display: block; font-size: 11px; color: var(--color-muted); }
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-line-soft);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.btn-logout:hover {
+  background: rgba(195, 48, 36, 0.08);
+  color: var(--color-danger);
+  border-color: rgba(195, 48, 36, 0.2);
+}
+.btn-logout svg { width: 16px; height: 16px; }
+
+/* Botão hambúrguer (mobile) */
+.btn-mobile {
+  display: none;
+  width: 40px; height: 40px;
+  align-items: center; justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--color-line-soft);
+  background: transparent;
+  cursor: pointer;
+}
+.btn-mobile svg { width: 22px; height: 22px; color: var(--color-ink); }
+
+/* Dropdown mobile */
+.mobile-dropdown {
+  display: none;
+  position: fixed;
+  top: 64px;
+  right: 12px;
+  width: 280px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: rgba(255, 253, 247, 0.98);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  backdrop-filter: saturate(160%) blur(20px);
+  border: 1px solid var(--color-line-soft);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 8px;
+  z-index: 49;
+}
+.mobile-dropdown.open { display: block; }
+
+.mobile-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-ink-soft);
+  transition: background 140ms ease, color 140ms ease;
+}
+.mobile-dropdown a:hover { background: var(--color-ink-wash); color: var(--color-ink); }
+.mobile-dropdown a.active { background: rgba(242, 193, 46, 0.16); color: var(--color-safety-deep); }
+.mobile-dropdown a svg { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
+
+.mobile-divider {
+  height: 1px;
+  background: var(--color-line-soft);
+  margin: 6px 8px;
+}
+.mobile-dropdown .btn-logout-item {
+  color: var(--color-danger);
+}
+.mobile-dropdown .btn-logout-item:hover {
+  background: rgba(195, 48, 36, 0.08);
+}
+
+/* ===== Conteúdo de exemplo (espelha admin/page.tsx) ===== */
+.main-content {
+  padding-top: 64px;
+}
+
+.page-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 20px 56px;
+}
+
+.page-header { margin-bottom: 28px; }
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-safety-deep);
+  margin-bottom: 8px;
+}
+.page-header h1 { font-size: clamp(28px, 5vw, 38px); font-weight: 700; margin-bottom: 10px; }
+.page-header p { font-size: 15px; color: var(--color-muted); max-width: 620px; }
+
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.stat-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+.stat-card strong { display: block; font-size: 32px; font-weight: 700; font-family: var(--font-display); margin-bottom: 2px; }
+.stat-card span { display: block; font-size: 14px; font-weight: 600; color: var(--color-ink); margin-bottom: 2px; }
+.stat-card small { display: block; font-size: 12px; color: var(--color-muted); }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.step-card {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line-soft);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: transform 160ms ease;
+}
+.step-card:hover { transform: translateY(-2px); }
+
+.step-number {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-safety-deep);
+  background: rgba(242, 193, 46, 0.16);
+  padding: 6px 10px;
+  border-radius: 8px;
+  height: fit-content;
+}
+.step-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.step-card p { font-size: 13px; color: var(--color-muted); }
+
+.callout-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--grad-brand);
+  color: #fffdf7;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-soft);
+}
+.callout-band .eyebrow { color: rgba(242, 193, 46, 0.9); }
+.callout-band strong { display: block; font-size: 15px; font-weight: 500; font-family: var(--font-body); max-width: 560px; line-height: 1.5; }
+.callout-band a {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.15);
+  border: 1px solid rgba(255, 253, 247, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #fffdf7;
+  white-space: nowrap;
+}
+.callout-band a:hover { background: rgba(255, 253, 247, 0.25); }
+
+/* ===== Responsivo ===== */
+@media (max-width: 1024px) {
+  .nav-desktop { display: none; }
+  .btn-mobile { display: flex; }
+  .btn-logout-desktop { display: none; }
+}
+
+@media (max-width: 640px) {
+  .brand-text { display: none; }
+  .user-pill-copy small { display: none; }
+  .callout-band { flex-direction: column; align-items: stretch; text-align: left; }
+  .callout-band a { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER FIXO (novo padrão visual) ===== -->
+<header class="app-header">
+  <div class="app-header-inner">
+
+    <!-- Marca -->
+    <div class="brand-area">
+      <span class="brand-mark">P</span>
+      <div class="brand-text">
+        <strong>PredialOps</strong>
+        <small>Facilities Brasil</small>
+      </div>
+    </div>
+
+    <!-- Menu Desktop -->
+    <nav class="nav-desktop">
+      <a href="#" class="active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Painel
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Contratos
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+        Ativos
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        OS
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="13" y="8" width="3" height="10"/></svg>
+        Medições
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Acessos
+      </a>
+      <a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        RGM
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <a href="#" class="user-pill">
+        <span class="user-dot"></span>
+        <div class="user-pill-copy">
+          <span>Admin</span>
+          <small>Superadmin — Best Clima</small>
+        </div>
+      </a>
+      <button class="btn-logout btn-logout-desktop">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+
+      <!-- Botão mobile -->
+      <button class="btn-mobile" id="btnMobile" aria-label="Menu">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Dropdown Mobile -->
+<div class="mobile-dropdown" id="mobileDropdown">
+  <a href="#" class="active">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Painel
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Contratos
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+    Ativos
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    OS
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="13" y="8" width="3" height="10"/></svg>
+    Medições
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Acessos
+  </a>
+  <a href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+    RGM
+  </a>
+  <div class="mobile-divider"></div>
+  <a href="#" class="btn-logout-item">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Sair
+  </a>
+</div>
+
+<!-- ===== Conteúdo de exemplo (página Painel) ===== -->
+<main class="main-content">
+  <div class="page-shell">
+    <header class="page-header">
+      <p class="eyebrow">Onboarding operacional</p>
+      <h1>Configurar um novo cliente e contrato.</h1>
+      <p>Siga a ordem abaixo. Cada etapa grava no Supabase com isolamento por tenant via RLS.</p>
+    </header>
+
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-icon">◈</div>
+        <strong>—</strong>
+        <span>Contratos ativos</span>
+        <small>Vigentes no tenant</small>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">◉</div>
+        <strong>—</strong>
+        <span>Sites cadastrados</span>
+        <small>Unidades operacionais</small>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">◎</div>
+        <strong>—</strong>
+        <span>Ativos em plano</span>
+        <small>Com PMOC vigente</small>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">◐</div>
+        <strong>—</strong>
+        <span>RGMs pendentes</span>
+        <small>Aguardando aceite</small>
+      </div>
+    </div>
+
+    <section class="section-grid">
+      <a href="#" class="step-card">
+        <span class="step-number">01</span>
+        <div>
+          <h2>Cliente</h2>
+          <p>Razão social, CNPJ e contatos de aprovação.</p>
+        </div>
+      </a>
+      <a href="#" class="step-card">
+        <span class="step-number">02</span>
+        <div>
+          <h2>Contrato</h2>
+          <p>Vigência, escopo, SLA, valor e reajuste.</p>
+        </div>
+      </a>
+      <a href="#" class="step-card">
+        <span class="step-number">03</span>
+        <div>
+          <h2>Site</h2>
+          <p>Unidade atendida, torre, bloco, loja ou campus.</p>
+        </div>
+      </a>
+      <a href="#" class="step-card">
+        <span class="step-number">04</span>
+        <div>
+          <h2>Ativo</h2>
+          <p>Equipamento sob manutenção ou base para importação.</p>
+        </div>
+      </a>
+    </section>
+
+    <section class="callout-band">
+      <div>
+        <p class="eyebrow">Operação mensal</p>
+        <strong>Após o contrato entrar em produção, o RGM passa a ser o entregável-chave para o cliente. Configure blocos por contrato e arquive a versão imutável após o aceite.</strong>
+      </div>
+      <a href="#">Abrir RGM →</a>
+    </section>
+  </div>
+</main>
+
+<script>
+// Toggle dropdown mobile
+const btn = document.getElementById('btnMobile');
+const dropdown = document.getElementById('mobileDropdown');
+btn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  dropdown.classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+    dropdown.classList.remove('open');
+  }
+});
+</script>
+
+</body>
+</html>
