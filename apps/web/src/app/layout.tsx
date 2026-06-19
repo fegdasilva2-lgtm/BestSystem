@@ -1,18 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { logout } from "@/app/auth/actions";
 import { getSessionProfile, roleLabels } from "@/lib/auth";
 import { colors } from "@predialops/ds/tokens";
 import "./globals.css";
 
 // Tipografia "Prancheta de obra":
-// - Archivo (eixo wdth expandido) — display industrial para headings/brand
+// - Space Grotesk — display geométrico com personality, peso 500-700
 // - Inter Tight — corpo neutro e apertado, leitura de tabela
 // - JetBrains Mono — códigos (OS-2026-0142), medições, datas NR
-const archivo = Archivo({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-  axes: ["wdth"],
+  weight: ["500", "600", "700"],
   display: "swap"
 });
 
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="pt-BR"
-      className={`${archivo.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
+      className={`${spaceGrotesk.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <div className="app-chrome">

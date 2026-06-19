@@ -60,7 +60,7 @@ export const shadow = {
 
 export const typography = {
   family: '"Inter Tight", "Segoe UI", sans-serif',
-  display: '"Archivo", "Segoe UI", sans-serif',
+  display: '"Space Grotesk", "Segoe UI", sans-serif',
   mono:    '"JetBrains Mono", ui-monospace, monospace',
   sizes: {
     xs:  "12px",
