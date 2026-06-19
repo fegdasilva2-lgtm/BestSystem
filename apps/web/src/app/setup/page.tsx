@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export default async function SetupPage({
   searchParams
 }: {
-  searchParams?: { error?: string };
+  searchParams?: { error?: string; secret?: string };
 }) {
   let hasUsers = false;
   let setupError: string | null = null;
