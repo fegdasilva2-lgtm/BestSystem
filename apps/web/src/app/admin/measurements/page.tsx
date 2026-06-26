@@ -1,132 +1,153 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { DataTable, type DataTableColumn } from "@/components/DataTable";
+import { getStatusBadgeClass, formatStatusLabel } from "@/lib/status-badges";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function MeasurementsListPage({
-  searchParams
+  searchParams,
 }: {
-  searchParams?: { q?: string; status?: string; month?: string };
+  searchParams?: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) redirect("/login");
 
+  const sp = await searchParams;
   const supabase = await createSupabaseServer();
-  const q = searchParams?.q || "";
-  const status = searchParams?.status || "";
-  const month = searchParams?.month || "";
+  const q = sp?.q || "";
+  const status = sp?.status || "";
+  const page = Math.max(1, parseInt(sp?.page ?? "1", 10) || 1);
+  const perPage = 15;
 
   let query = supabase
     .from("measurements")
-    .select("id, reference_month, total_amount, status, created_at, contracts(code, customers(name))")
+    .select("id, period, status, gross_amount, net_amount, created_at, contract_id, contracts(code)", { count: "exact" })
     .eq("tenant_id", profile.tenant.id)
-    .order("reference_month", { ascending: false });
+    .order("period", { ascending: false });
 
-  if (q) {
-    query = query.or(`reference_month.ilike.%${q}%`);
-  }
-  if (status) {
-    query = query.eq("status", status);
-  }
-  if (month) {
-    query = query.eq("reference_month", month);
-  }
+  if (q) query = query.or(`period.ilike.%${q}%`);
+  if (status) query = query.eq("status", status);
 
-  const { data: measurements, error } = await query;
+  const from = (page - 1) * perPage;
+  query = query.range(from, from + perPage - 1);
+
+  const { data: measurements, error, count } = await query;
+  const totalPages = count ? Math.ceil(count / perPage) : 0;
+
+  const columns: DataTableColumn[] = [
+    {
+      key: "period",
+      label: "Período",
+      sortable: true,
+      render: (row) => (
+        <Link href={`/admin/measurements/${row.id}`} className="table-link">
+          {String(row.period)}
+        </Link>
+      ),
+    },
+    {
+      key: "contracts",
+      label: "Contrato",
+      render: (row) => {
+        const c = row.contracts as { code?: string } | null;
+        return c?.code ?? "—";
+      },
+    },
+    {
+      key: "gross_amount",
+      label: "Bruto",
+      sortable: true,
+      render: (_, value) =>
+        value
+          ? Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : "—",
+    },
+    {
+      key: "net_amount",
+      label: "Líquido",
+      sortable: true,
+      render: (_, value) =>
+        value
+          ? Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : "—",
+    },
+    {
+      key: "created_at",
+      label: "Criado",
+      sortable: true,
+      render: (_, value) => (value ? new Date(String(value)).toLocaleDateString("pt-BR") : "—"),
+    },
+    {
+      key: "status",
+      label: "Status",
+      sortable: true,
+      render: (_, value) => (
+        <span className={getStatusBadgeClass(String(value ?? ""))}>
+          {formatStatusLabel(String(value ?? ""))}
+        </span>
+      ),
+    },
+  ];
+
+  const pageParams: Record<string, string> = {};
+  if (q) pageParams.q = q;
+  if (status) pageParams.status = status;
 
   return (
-    <main className="page-shell">
+    <main>
+      <div className="telemetry-line" aria-hidden="true" />
+
       <header className="page-header animate-fade-in-up">
         <p className="eyebrow">Financeiro</p>
         <div className="page-header-row">
           <div>
             <h1>Medições.</h1>
-            <p>Fechamentos mensais por contrato — contestação, aceite e aprovação.</p>
+            <p>Fechamentos mensais por contrato — envio, aceite e contestação.</p>
           </div>
-          <a href="/admin/measurements/new" className="button-link primary">
+          <Link href="/admin/measurements/new" className="button-link primary">
             + Nova medição
-          </a>
+          </Link>
         </div>
       </header>
 
-      {/* Filters */}
       <form method="get" className="filter-bar animate-fade-in-up" style={{ animationDelay: "80ms" }}>
         <div className="filter-row">
           <input
             name="q"
             type="search"
-            placeholder="Buscar por mês (ex: 2026-06)..."
+            placeholder="Buscar por período (ex: 2026-06)..."
             defaultValue={q}
             className="filter-input"
           />
           <select name="status" defaultValue={status} className="filter-select">
-            <option value="">Todos status</option>
+            <option value="">Todos os status</option>
             <option value="rascunho">Rascunho</option>
-            <option value="enviada">Enviada</option>
-            <option value="contestada">Contestada</option>
+            <option value="pre_enviada">Pré-enviada</option>
+            <option value="em_aceite">Em aceite</option>
             <option value="aprovada">Aprovada</option>
+            <option value="contestada">Contestada</option>
             <option value="faturada">Faturada</option>
           </select>
           <button type="submit" className="button-link">Filtrar</button>
-          {q || status || month ? (
-            <a href="/admin/measurements" className="button-link">Limpar</a>
-          ) : null}
+          {(q || status) && <a href="/admin/measurements" className="button-link">Limpar</a>}
         </div>
       </form>
 
-      {/* Table */}
-      <div className="table-card animate-fade-in-up" style={{ animationDelay: "160ms" }}>
+      <div className="animate-fade-in-up" style={{ animationDelay: "160ms" }}>
         {error ? (
-          <p className="table-error">Erro ao carregar medições: {error.message}</p>
-        ) : !measurements || measurements.length === 0 ? (
-          <div className="table-empty">
-            <p className="eyebrow">Nenhuma medição encontrada</p>
-            <p>Medições são geradas automaticamente ao fechar o período de um contrato ativo.</p>
-          </div>
+          <div className="table-card"><p className="table-error">Erro: {error.message}</p></div>
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Mês referência</th>
-                <th>Contrato</th>
-                <th>Valor total</th>
-                <th>Criada em</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {measurements.map((m) => {
-                const contract = (m as any).contracts;
-                return (
-                  <tr key={m.id}>
-                    <td>
-                      <a href={`/admin/measurements/${m.id}`} className="table-link">
-                        {m.reference_month}
-                      </a>
-                    </td>
-                    <td>
-                      {contract
-                        ? `${contract.code} — ${(contract as any).customers?.name || ""}`
-                        : "—"}
-                    </td>
-                    <td>
-                      {m.total_amount
-                        ? m.total_amount.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL"
-                          })
-                        : "—"}
-                    </td>
-                    <td>{new Date(m.created_at).toLocaleDateString("pt-BR")}</td>
-                    <td>
-                      <span className={`status-badge status-${m.status}`}>{m.status}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            rows={(measurements ?? []) as unknown as Record<string, unknown>[]}
+            page={page}
+            totalPages={totalPages}
+            baseUrl="/admin/measurements"
+            searchParams={pageParams}
+          />
         )}
       </div>
     </main>
