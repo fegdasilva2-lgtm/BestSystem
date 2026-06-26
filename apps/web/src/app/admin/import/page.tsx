@@ -1,37 +1,47 @@
+import Link from "next/link";
+
+const templates = [
+  { name: "Ativos", file: "template-ativos.csv", desc: "Equipamentos: TAG, nome, tipo, fabricante, criticidade, local, site." },
+  { name: "Contratos", file: "template-contratos.csv", desc: "Contratos: código, escopo, vigência, valor mensal, regra de cobrança." },
+  { name: "Ordens de Serviço", file: "template-os.csv", desc: "OS: tipo, prioridade, descrição, prazo, contrato, site, ativo." },
+  { name: "Medições", file: "template-medicoes.csv", desc: "Medições mensais: contrato, período, valor bruto, observações." },
+  { name: "Locais", file: "template-locais.csv", desc: "Sites e ambientes: nome do site, endereço, local, tipo de ambiente." },
+];
+
 export default function ImportPage() {
   return (
-    <main className="page-shell narrow">
-      <header className="page-header">
+    <main>
+      <div className="telemetry-line" aria-hidden="true" />
+
+      <header className="page-header animate-fade-in-up">
         <p className="eyebrow">Importação em massa</p>
-        <h1>Ativos e planos entram pela PWA.</h1>
-        <p>
-          No piloto atual, o importador funcional fica no app offline-first para validar
-          CSV/Excel, preview, rejeições, undo e geração posterior do cronograma.
-        </p>
+        <h1>Modelos de planilha.</h1>
+        <p>Baixe o modelo, preencha com seus dados e importe via CSV/Excel.</p>
       </header>
 
-      <section className="section-grid two">
-        <article className="glass-card">
-          <p className="eyebrow">Fluxo validado</p>
-          <h2>Modelo, upload, preview e confirmação</h2>
-          <p className="muted">
-            A PWA valida linhas inválidas sem bloquear as válidas e preserva histórico local.
-          </p>
-        </article>
-        <article className="glass-card">
-          <p className="eyebrow">Próximo passo</p>
-          <h2>Levar o importador para o admin web</h2>
-          <p className="muted">
-            A versão web deve reutilizar as mesmas regras e gravar com RLS no Supabase.
-          </p>
-        </article>
+      <section className="section-grid two stagger-children" style={{ marginTop: 14 }}>
+        {templates.map((t) => (
+          <article key={t.file} className="glass-card hover-lift animate-fade-in-up">
+            <p className="eyebrow">Modelo</p>
+            <h2>{t.name}</h2>
+            <p className="muted">{t.desc}</p>
+            <div style={{ marginTop: 12 }}>
+              <a href={`/templates/${t.file}`} className="button-link primary" download>
+                Baixar CSV
+              </a>
+            </div>
+          </article>
+        ))}
       </section>
 
-      <section className="callout-band">
-        <strong>Para testar agora, suba a PWA com `npm run dev:mobile` e abra a aba Importar.</strong>
-        <a className="button-link" style={{ background: "#fffdf5" }} href="/admin">
-          Voltar ao onboarding
-        </a>
+      <section className="callout-band animate-fade-in-up" style={{ marginTop: 14, animationDelay: "320ms" }}>
+        <div>
+          <p className="eyebrow">Como importar</p>
+          <strong>
+            Após preencher a planilha, use a importação via PWA (offline-first) ou aguarde o importador web que está em desenvolvimento.
+          </strong>
+        </div>
+        <Link href="/admin" className="button-link">Voltar ao painel</Link>
       </section>
     </main>
   );

@@ -1,0 +1,4 @@
+type,priority,description,due_at,contract_code,site_name,asset_code
+preventiva,media,Limpeza e inspeção de fancoils - 3º andar,2026-07-15,CT-001,Shopping Centro,EQ-002
+corretiva,alta,Vazamento no chiller principal - Casa de Máquinas,2026-07-01,CT-001,Shopping Centro,EQ-001
+inspecao,baixa,Ronda de verificação de filtros,2026-07-10,CT-002,Edifício Corporativo,

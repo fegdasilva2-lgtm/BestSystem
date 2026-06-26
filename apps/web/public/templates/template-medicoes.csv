@@ -1,0 +1,4 @@
+contract_code,period,gross_amount,notes
+CT-001,2026-06,15000.00,Medição referente junho/2026 — sem glosas
+CT-001,2026-07,14800.00,Desconto de R$200 por indisponibilidade de 2 fancoils
+CT-002,2026-06,8500.00,Serviço executado conforme contrato

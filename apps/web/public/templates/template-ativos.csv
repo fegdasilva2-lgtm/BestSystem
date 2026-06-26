@@ -1,0 +1,3 @@
+code,name,type,manufacturer,model,serial,criticality,status,location_name,site_name,install_date,warranty_until
+EQ-001,Chiller Carrier 30XA,chiller,Carrier,30XA0802,ABC123456,alta,operacional,Casa de Máquinas,Shopping Centro,2024-01-15,2026-01-15
+EQ-002,Fancoil Trane,fancoil,Trane,FC-400,XYZ789012,media,operacional,3º Andar - Sala Técnica,Shopping Centro,2024-03-20,2026-03-20

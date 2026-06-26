@@ -1,0 +1,3 @@
+code,scope,starts_on,ends_on,monthly_value,billing_rule,rgm_periodicity,customer_name
+CT-001,Manutenção predial completa - HVAC e elétrica,2025-01-01,2026-12-31,15000.00,Mensal fixo reajustável por IPCA,mensal,Shopping Centro
+CT-002,Manutenção de ar condicionado central,2025-06-01,2026-05-31,8500.00,Mensal fixo,mensal,Edifício Corporativo
