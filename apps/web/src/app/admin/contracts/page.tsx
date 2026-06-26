@@ -2,14 +2,13 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/DataTable";
-import { getStatusBadgeClass, formatStatusLabel } from "@/lib/status-badges";
 
 export const dynamic = "force-dynamic";
 
 export default async function ContractsListPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; status?: string; page?: string }>;
+  searchParams?: Promise<{ q?: string; page?: string }>;
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) redirect("/login");
@@ -17,22 +16,17 @@ export default async function ContractsListPage({
   const sp = await searchParams;
   const supabase = await createSupabaseServer();
   const q = sp?.q || "";
-  const status = sp?.status || "";
   const page = Math.max(1, parseInt(sp?.page ?? "1", 10) || 1);
   const perPage = 15;
 
-  // Query com contagem
   let query = supabase
     .from("contracts")
-    .select("id, code, scope, starts_on, ends_on, monthly_value, status, customers(name)", { count: "exact" })
+    .select("id, code, scope, starts_on, ends_on, monthly_value, customers(name)", { count: "exact" })
     .eq("tenant_id", profile.tenant.id)
     .order("created_at", { ascending: false });
 
   if (q) {
     query = query.or(`code.ilike.%${q}%,scope.ilike.%${q}%`);
-  }
-  if (status) {
-    query = query.eq("status", status);
   }
 
   const from = (page - 1) * perPage;
@@ -85,25 +79,13 @@ export default async function ContractsListPage({
           ? Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : "—",
     },
-    {
-      key: "status",
-      label: "Status",
-      sortable: true,
-      render: (_, value) => (
-        <span className={getStatusBadgeClass(String(value ?? ""))}>
-          {formatStatusLabel(String(value ?? ""))}
-        </span>
-      ),
-    },
   ];
 
-  // Preservar filtros nos searchParams da paginação
   const pageParams: Record<string, string> = {};
   if (q) pageParams.q = q;
-  if (status) pageParams.status = status;
 
   return (
-    <main className="page-shell">
+    <main>
       <div className="telemetry-line" aria-hidden="true" />
 
       <header className="page-header animate-fade-in-up">
@@ -129,24 +111,15 @@ export default async function ContractsListPage({
             defaultValue={q}
             className="filter-input"
           />
-          <select name="status" defaultValue={status} className="filter-select">
-            <option value="">Todos os status</option>
-            <option value="draft">Rascunho</option>
-            <option value="active">Ativo</option>
-            <option value="suspended">Suspenso</option>
-            <option value="terminated">Encerrado</option>
-          </select>
           <button type="submit" className="button-link">Filtrar</button>
-          {(q || status) && (
-            <a href="/admin/contracts" className="button-link">Limpar</a>
-          )}
+          {q && <a href="/admin/contracts" className="button-link">Limpar</a>}
         </div>
       </form>
 
       {/* Tabela */}
       <div className="animate-fade-in-up" style={{ animationDelay: "160ms" }}>
         {error ? (
-          <p className="table-error">Erro ao carregar contratos: {error.message}</p>
+          <div className="table-card"><p className="table-error">Erro ao carregar contratos: {error.message}</p></div>
         ) : (
           <DataTable
             columns={columns}
