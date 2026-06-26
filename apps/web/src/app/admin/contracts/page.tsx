@@ -1,24 +1,30 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { DataTable, type DataTableColumn } from "@/components/DataTable";
+import { getStatusBadgeClass, formatStatusLabel } from "@/lib/status-badges";
 
 export const dynamic = "force-dynamic";
 
 export default async function ContractsListPage({
-  searchParams
+  searchParams,
 }: {
-  searchParams?: { q?: string; status?: string };
+  searchParams?: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) redirect("/login");
 
+  const sp = await searchParams;
   const supabase = await createSupabaseServer();
-  const q = searchParams?.q || "";
-  const status = searchParams?.status || "";
+  const q = sp?.q || "";
+  const status = sp?.status || "";
+  const page = Math.max(1, parseInt(sp?.page ?? "1", 10) || 1);
+  const perPage = 15;
 
+  // Query com contagem
   let query = supabase
     .from("contracts")
-    .select("id, code, scope, starts_on, ends_on, monthly_value, status, customers(name)")
+    .select("id, code, scope, starts_on, ends_on, monthly_value, status, customers(name)", { count: "exact" })
     .eq("tenant_id", profile.tenant.id)
     .order("created_at", { ascending: false });
 
@@ -29,12 +35,79 @@ export default async function ContractsListPage({
     query = query.eq("status", status);
   }
 
-  const { data: contracts, error } = await query;
+  const from = (page - 1) * perPage;
+  query = query.range(from, from + perPage - 1);
+
+  const { data: contracts, error, count } = await query;
+  const totalPages = count ? Math.ceil(count / perPage) : 0;
+
+  const columns: DataTableColumn[] = [
+    {
+      key: "code",
+      label: "Código",
+      sortable: true,
+      render: (row, value) => (
+        <a href={`/admin/contracts/${row.id}`} className="table-link">
+          {String(value ?? "—")}
+        </a>
+      ),
+    },
+    {
+      key: "customers",
+      label: "Cliente",
+      sortable: true,
+      render: (row) => {
+        const c = row.customers as { name?: string } | null;
+        return c?.name ?? "—";
+      },
+    },
+    { key: "scope", label: "Escopo", sortable: true, className: "td-wrap" },
+    {
+      key: "starts_on",
+      label: "Início",
+      sortable: true,
+      render: (_, value) =>
+        value ? new Date(String(value)).toLocaleDateString("pt-BR") : "—",
+    },
+    {
+      key: "ends_on",
+      label: "Término",
+      sortable: true,
+      render: (_, value) =>
+        value ? new Date(String(value)).toLocaleDateString("pt-BR") : "—",
+    },
+    {
+      key: "monthly_value",
+      label: "Valor mensal",
+      sortable: true,
+      render: (_, value) =>
+        value
+          ? Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+          : "—",
+    },
+    {
+      key: "status",
+      label: "Status",
+      sortable: true,
+      render: (_, value) => (
+        <span className={getStatusBadgeClass(String(value ?? ""))}>
+          {formatStatusLabel(String(value ?? ""))}
+        </span>
+      ),
+    },
+  ];
+
+  // Preservar filtros nos searchParams da paginação
+  const pageParams: Record<string, string> = {};
+  if (q) pageParams.q = q;
+  if (status) pageParams.status = status;
 
   return (
     <main className="page-shell">
+      <div className="telemetry-line" aria-hidden="true" />
+
       <header className="page-header animate-fade-in-up">
-        <p className="eyebrow">Contract Ops</p>
+        <p className="eyebrow">Operações contratuais</p>
         <div className="page-header-row">
           <div>
             <h1>Contratos.</h1>
@@ -46,7 +119,7 @@ export default async function ContractsListPage({
         </div>
       </header>
 
-      {/* Filters */}
+      {/* Filtros */}
       <form method="get" className="filter-bar animate-fade-in-up" style={{ animationDelay: "80ms" }}>
         <div className="filter-row">
           <input
@@ -64,61 +137,25 @@ export default async function ContractsListPage({
             <option value="terminated">Encerrado</option>
           </select>
           <button type="submit" className="button-link">Filtrar</button>
-          {q || status ? (
+          {(q || status) && (
             <a href="/admin/contracts" className="button-link">Limpar</a>
-          ) : null}
+          )}
         </div>
       </form>
 
-      {/* Table */}
-      <div className="table-card animate-fade-in-up" style={{ animationDelay: "160ms" }}>
+      {/* Tabela */}
+      <div className="animate-fade-in-up" style={{ animationDelay: "160ms" }}>
         {error ? (
           <p className="table-error">Erro ao carregar contratos: {error.message}</p>
-        ) : !contracts || contracts.length === 0 ? (
-          <div className="table-empty">
-            <p className="eyebrow">Nenhum contrato encontrado</p>
-            <p>Crie o primeiro contrato ou ajuste os filtros da busca.</p>
-            <a href="/admin/contracts/new" className="button-link primary" style={{ marginTop: 12 }}>
-              + Novo contrato
-            </a>
-          </div>
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Cliente</th>
-                <th>Escopo</th>
-                <th>Início</th>
-                <th>Término</th>
-                <th>Valor mensal</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contracts.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <a href={`/admin/contracts/${c.id}`} className="table-link">
-                      {c.code}
-                    </a>
-                  </td>
-                  <td>{(c as any).customers?.name || "—"}</td>
-                  <td className="td-wrap">{c.scope}</td>
-                  <td>{c.starts_on ? new Date(c.starts_on).toLocaleDateString("pt-BR") : "—"}</td>
-                  <td>{c.ends_on ? new Date(c.ends_on).toLocaleDateString("pt-BR") : "—"}</td>
-                  <td>
-                    {c.monthly_value
-                      ? c.monthly_value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-                      : "—"}
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${c.status}`}>{c.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            rows={(contracts ?? []) as unknown as Record<string, unknown>[]}
+            page={page}
+            totalPages={totalPages}
+            baseUrl="/admin/contracts"
+            searchParams={pageParams}
+          />
         )}
       </div>
     </main>
