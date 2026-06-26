@@ -2146,6 +2146,21 @@ kbd {
   margin-top: 8px;
 }
 
+/* ── Portal do cliente ── */
+.portal-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-actions {
+  display: flex;
+  gap: 8px;
+}
+
 @media (max-width: 768px) {
   .data-table {
     display: block;

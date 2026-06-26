@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { aceitarMedicaoPortal, contestarMedicaoPortal, comentarOSPortal } from "./actions";
+import { EmptyState } from "@/components/EmptyState";
+import { getStatusBadgeClass, formatStatusLabel } from "@/lib/status-badges";
 
 interface Contract { id: string; code: string; scope: string; monthly_value: number; billing_rule: string; }
 interface Measurement { id: string; contract_id: string; period: string; status: string; gross_amount: number; discount_amount: number; net_amount: number; approved_at: string | null; }
@@ -17,7 +19,7 @@ interface Props {
 }
 
 const fmtBRL = (n: number) => Number(n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const fmtDate = (s: string | null) => s ? new Date(s).toLocaleDateString("pt-BR") : "-";
+const fmtDate = (s: string | null) => s ? new Date(s).toLocaleDateString("pt-BR") : "—";
 
 export default function PortalClient({ contracts, measurements, workOrders, rgmVersions, role }: Props) {
   const [contestId, setContestId] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
   const [isPending, startTransition] = useTransition();
 
   function runAccept(med: Measurement) {
-    if (!confirm(`Aceitar medição ${med.id} (${fmtBRL(med.net_amount)})?`)) return;
+    if (!confirm(`Aceitar medição ${med.period} (${fmtBRL(med.net_amount)})?`)) return;
     setFeedback(null);
     const fd = new FormData();
     fd.set("measurementId", med.id);
@@ -34,7 +36,7 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
     fd.set("period", med.period);
     startTransition(async () => {
       const r = await aceitarMedicaoPortal(fd);
-      setFeedback(r.error ? { type: "err", msg: r.error } : { type: "ok", msg: `Medição ${med.id} aceita.` });
+      setFeedback(r.error ? { type: "err", msg: r.error } : { type: "ok", msg: `Medição ${med.period} aceita.` });
     });
   }
 
@@ -73,50 +75,81 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
   const contractLabel = (id: string) => contracts.find((c) => c.id === id)?.code ?? id;
   const medToContest = measurements.find((m) => m.id === contestId);
 
+  const pendingMeasurements = measurements.filter((m) =>
+    ["pre_enviada", "em_aceite", "contestada"].includes(m.status)
+  );
+
   return (
     <>
       {feedback ? (
         <p className={`form-${feedback.type === "ok" ? "status" : "error"}`}>{feedback.msg}</p>
       ) : null}
 
-      <section className="section-grid two">
+      {/* KPI cards — medições pendentes com valores destacados */}
+      {pendingMeasurements.length > 0 && (
+        <section className="kpi-strip stagger-children" style={{ marginTop: 14 }}>
+          {pendingMeasurements.map((m) => (
+            <article key={m.id} className="kpi-card animate-fade-in-up">
+              <div>
+                <p className="eyebrow">{contractLabel(m.contract_id)} — {m.period}</p>
+                <strong>{fmtBRL(m.net_amount)}</strong>
+                <span className={getStatusBadgeClass(m.status)} style={{ marginTop: 6 }}>
+                  {formatStatusLabel(m.status)}
+                </span>
+              </div>
+              <div className="kpi-actions" style={{ marginTop: 10 }}>
+                <button className="primary-button" type="button" onClick={() => runAccept(m)} disabled={isPending}>
+                  Aceitar
+                </button>
+                <button className="ghost-button" type="button" onClick={() => setContestId(m.id)} disabled={isPending}>
+                  Contestar
+                </button>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
+
+      <section className="section-grid two" style={{ marginTop: 14 }}>
+        {/* Medições recentes */}
         <article className="glass-card">
           <p className="eyebrow">Medições</p>
-          <h2>{measurements.length} recentes</h2>
+          <h2>{measurements.length} no período</h2>
           {measurements.length === 0 ? (
-            <p className="muted">Sem medições para exibir.</p>
+            <EmptyState title="Sem medições" description="Nenhuma medição encontrada para o período." />
           ) : (
-            <ul>
+            <ul className="portal-list">
               {measurements.map((m) => (
                 <li key={m.id} className="profile-row">
                   <span>
-                    <strong>{contractLabel(m.contract_id)} - {m.period}</strong>
-                    <small className="muted">{fmtBRL(m.net_amount)} ({m.status})</small>
+                    <strong>{contractLabel(m.contract_id)} — {m.period}</strong>
+                    <small className="muted">{fmtBRL(m.net_amount)}</small>
                   </span>
-                  <span className="status-pill">{m.status}</span>
+                  <span className={getStatusBadgeClass(m.status)}>{formatStatusLabel(m.status)}</span>
                 </li>
               ))}
             </ul>
           )}
         </article>
 
+        {/* RGMs */}
         <article className="glass-card">
           <p className="eyebrow">RGMs arquivados</p>
           <h2>{rgmVersions.length} no histórico</h2>
           {rgmVersions.length === 0 ? (
-            <p className="muted">Sem RGMs arquivados ainda.</p>
+            <EmptyState title="Sem RGMs" description="Nenhum relatório mensal arquivado ainda." />
           ) : (
-            <ul>
+            <ul className="portal-list">
               {rgmVersions.map((r) => (
                 <li key={r.id} className="profile-row">
                   <span>
-                    <strong>{contractLabel(r.contract_id)} - {r.period}</strong>
+                    <strong>{contractLabel(r.contract_id)} — {r.period}</strong>
                     <small className="muted">Por {r.approved_by} em {fmtDate(r.approved_at)}</small>
                   </span>
                   {r.file_url ? (
                     <a className="button-link" href={r.file_url} target="_blank" rel="noreferrer">PDF</a>
                   ) : (
-                    <span className="muted">sem PDF</span>
+                    <span className="muted">—</span>
                   )}
                 </li>
               ))}
@@ -125,64 +158,46 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
         </article>
       </section>
 
-      <section className="form-card">
+      {/* Ordens de serviço */}
+      <section className="form-card" style={{ marginTop: 14 }}>
         <div className="form-grid two">
           <div>
             <p className="eyebrow">Em andamento</p>
             <h2>Ordens de serviço</h2>
           </div>
         </div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr><th>OS</th><th>Contrato</th><th>Tipo</th><th>Prioridade</th><th>Status</th><th>Vencimento</th><th>Ações</th></tr>
-            </thead>
-            <tbody>
-              {workOrders.map((wo) => (
-                <tr key={wo.id}>
-                  <td><strong>{wo.id}</strong><br /><small>{wo.description?.slice(0, 50)}</small></td>
-                  <td>{contractLabel(wo.contract_id)}</td>
-                  <td>{wo.type}</td>
-                  <td>{wo.priority}</td>
-                  <td><span className="status-pill">{wo.status}</span></td>
-                  <td>{fmtDate(wo.due_at)}</td>
-                  <td>
-                    <button className="ghost-button" type="button" onClick={() => setCommentWoId(wo.id)}>Comentar</button>
-                  </td>
-                </tr>
-              ))}
-              {workOrders.length === 0 ? (
-                <tr><td colSpan={7} className="muted">Nenhuma OS visível.</td></tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
+        {workOrders.length === 0 ? (
+          <EmptyState title="Nenhuma OS" description="Não há ordens de serviço em andamento no momento." />
+        ) : (
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr><th>OS</th><th>Contrato</th><th>Tipo</th><th>Prioridade</th><th>Status</th><th>Vencimento</th><th>Ações</th></tr>
+              </thead>
+              <tbody>
+                {workOrders.map((wo) => (
+                  <tr key={wo.id}>
+                    <td><strong>{wo.id.slice(0, 8)}</strong><br /><small>{wo.description?.slice(0, 50)}</small></td>
+                    <td>{contractLabel(wo.contract_id)}</td>
+                    <td>{formatStatusLabel(wo.type)}</td>
+                    <td><span className="priority-badge">{formatStatusLabel(wo.priority)}</span></td>
+                    <td><span className={getStatusBadgeClass(wo.status)}>{formatStatusLabel(wo.status)}</span></td>
+                    <td>{fmtDate(wo.due_at)}</td>
+                    <td>
+                      <button className="ghost-button compact" type="button" onClick={() => setCommentWoId(wo.id)}>Comentar</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      {(role === "cliente_gestor" || role === "admin_org") && measurements.some((m) => ["pre_enviada", "em_aceite", "contestada"].includes(m.status)) ? (
-        <section className="form-card">
-          <h2>Ações de aceite e contestação</h2>
-          <p className="muted">Aprove ou conteste as medições em aberto para o seu tenant.</p>
-          <ul>
-            {measurements.filter((m) => ["pre_enviada", "em_aceite", "contestada"].includes(m.status)).map((m) => (
-              <li key={m.id} className="profile-row">
-                <span>
-                  <strong>{contractLabel(m.contract_id)} - {m.period}</strong>
-                  <small className="muted">{fmtBRL(m.net_amount)} ({m.status})</small>
-                </span>
-                <span style={{ display: "flex", gap: 8 }}>
-                  <button className="primary-button" type="button" onClick={() => runAccept(m)} disabled={isPending}>Aceitar</button>
-                  <button className="ghost-button" type="button" onClick={() => setContestId(m.id)} disabled={isPending}>Contestar</button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
+      {/* Contestação */}
       {medToContest ? (
-        <section className="form-card">
-          <h2>Contestar medição {medToContest.id}</h2>
+        <section className="form-card" style={{ marginTop: 14 }}>
+          <h2>Contestar medição — {medToContest.period}</h2>
           <form onSubmit={runContest} className="form-grid">
             <label className="field">
               <span>Valor contestado (R$)</span>
@@ -200,9 +215,10 @@ export default function PortalClient({ contracts, measurements, workOrders, rgmV
         </section>
       ) : null}
 
+      {/* Comentário OS */}
       {commentWoId ? (
-        <section className="form-card">
-          <h2>Comentar OS {commentWoId}</h2>
+        <section className="form-card" style={{ marginTop: 14 }}>
+          <h2>Comentar OS</h2>
           <form onSubmit={runComment} className="form-grid">
             <label className="field full">
               <span>Comentário</span>
