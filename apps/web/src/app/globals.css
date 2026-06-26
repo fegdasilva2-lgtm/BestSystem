@@ -1857,6 +1857,26 @@ kbd {
 }
 
 /* Badges — paleta 3-tons semântica (ok/warn/danger) + neutro */
+
+/* Genéricos — use getStatusBadgeClass() para mapear */
+.badge-ok {
+  color: var(--color-ok);
+  background: var(--color-ok-wash);
+}
+.badge-warn {
+  color: var(--color-warn);
+  background: var(--color-warn-wash);
+}
+.badge-danger {
+  color: var(--color-danger);
+  background: var(--color-danger-wash);
+}
+.badge-muted {
+  color: var(--color-muted);
+  background: var(--color-ink-wash);
+}
+
+/* Específicos — mantidos para compatibilidade */
 .status-badge.status-active,
 .status-badge.status-aprovada,
 .status-badge.status-concluida,
