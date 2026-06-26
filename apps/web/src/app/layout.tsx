@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { logout } from "@/app/auth/actions";
 import { Header } from "@/components/Header";
+import { BreadcrumbBar } from "@/components/BreadcrumbBar";
 import { getSessionProfile, roleLabels } from "@/lib/auth";
 import { colors } from "@predialops/ds/tokens";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 : null
             }
           />
+          <BreadcrumbBar />
           {children}
         </div>
       </body>
