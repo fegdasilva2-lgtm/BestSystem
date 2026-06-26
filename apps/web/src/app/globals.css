@@ -2161,6 +2161,109 @@ kbd {
   gap: 8px;
 }
 
+/* ── Work Order timeline ── */
+.wo-timeline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.wo-timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 72px;
+  position: relative;
+  flex: 1;
+  opacity: 0.42;
+  transition: opacity 200ms ease;
+}
+
+.wo-timeline-step::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--color-line);
+  z-index: 0;
+}
+.wo-timeline-step:last-child::after { display: none; }
+
+.wo-timeline-step.done { opacity: 1; }
+.wo-timeline-step.done::after { background: var(--color-ok); }
+.wo-timeline-step.current { opacity: 1; }
+.wo-timeline-step.canceled { opacity: 0.36; }
+.wo-timeline-step.canceled::after { background: var(--color-danger); }
+
+.wo-step-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--color-line);
+  border: 2px solid var(--color-concrete);
+  z-index: 1;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+.wo-timeline-step.done .wo-step-dot { background: var(--color-ok); }
+.wo-timeline-step.current .wo-step-dot {
+  background: var(--color-safety);
+  border-color: var(--color-safety);
+  box-shadow: 0 0 0 4px rgba(242, 193, 46, 0.22);
+}
+.wo-timeline-step.canceled .wo-step-dot { background: var(--color-danger); }
+
+.wo-step-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+.wo-timeline-step.current .wo-step-label { color: var(--color-safety-deep); }
+
+.wo-actions {
+  padding: 12px 0 0;
+  border-top: 1px solid var(--color-line-soft);
+}
+
+/* ── Detail list ── */
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+}
+.detail-list div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.detail-list dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.detail-list dd {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .data-table {
     display: block;
