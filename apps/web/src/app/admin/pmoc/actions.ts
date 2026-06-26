@@ -59,12 +59,19 @@ export async function criarPmoc(form: FormData): Promise<PmocResult> {
     .single();
   if (error) return { error: error.message };
 
+  // Busca locations do site para filtrar assets
+  const { data: siteLocations } = await supabase
+    .from("locations")
+    .select("id")
+    .eq("site_id", plan.site_id);
+  const locationIds = (siteLocations ?? []).map((l) => l.id);
+
   // Gera atividades a partir dos HVAC do site
   const { data: hvacAssets } = await supabase
     .from("assets")
     .select("id, type, manufacturer, model, serial, location_id")
     .eq("tenant_id", profile.tenant.id)
-    .eq("site_id", plan.site_id);
+    .in("location_id", locationIds.length > 0 ? locationIds : ["none"]);
 
   const result = gerarPmoc({
     plan: {

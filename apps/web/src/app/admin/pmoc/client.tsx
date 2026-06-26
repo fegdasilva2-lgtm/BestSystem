@@ -8,7 +8,7 @@ interface Contract { id: string; code: string; }
 interface Site { id: string; name: string; }
 interface Activity { id: string; pmoc_plan_id: string; asset_id: string; code: string; name: string; frequency: string; priority: string; }
 interface Execution { id: string; pmoc_plan_id: string; pmoc_activity_id: string; asset_id: string; executed_at: string; result: string; photo_count: number; observations: string | null; next_due_at: string; }
-interface HvacAsset { id: string; code: string; name: string; type: string; site_id: string; }
+interface HvacAsset { id: string; code: string; name: string; type: string; location_id: string; locations: { site_id: string } | { site_id: string }[] | null; }
 
 interface Props {
   plans: Plan[];
@@ -242,7 +242,12 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <span>Ativo</span>
               <select name="assetId" required>
                 <option value="">Selecione...</option>
-                {hvacAssets.filter((h) => h.site_id === plans.find((p) => p.id === selectedPlanId)?.site_id).map((h) => (
+                {hvacAssets.filter((h) => {
+                  const locSiteId = h.locations
+                    ? Array.isArray(h.locations) ? (h.locations[0]?.site_id ?? null) : h.locations.site_id
+                    : null;
+                  return locSiteId === plans.find((p) => p.id === selectedPlanId)?.site_id;
+                }).map((h) => (
                   <option key={h.id} value={h.id}>{h.code} - {h.type}</option>
                 ))}
               </select>

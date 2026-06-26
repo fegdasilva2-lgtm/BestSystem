@@ -19,7 +19,7 @@ export default async function PmocPage() {
     supabase.from("sites").select("id, name").order("name"),
     supabase.from("pmoc_activities").select("*"),
     supabase.from("pmoc_executions").select("*").order("executed_at", { ascending: false }).limit(50),
-    supabase.from("assets").select("id, code, name, type, location_id, site_id")
+    supabase.from("assets").select("id, code, name, type, location_id, locations(site_id)")
       .in("type", ["chiller","ahu","fancoil","vrf","vrv","split","rooftop","coolingtower"])
   ]);
 
