@@ -2079,6 +2079,73 @@ kbd {
   color: var(--color-muted);
 }
 
+/* ── Skeleton loading ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-line-soft), rgba(201, 197, 186, 0.34), var(--color-line-soft));
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1800ms ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+.skeleton-radius-sm { border-radius: var(--radius-sm); }
+.skeleton-radius-md { border-radius: var(--radius-md); }
+.skeleton-radius-full { border-radius: 999px; }
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+.skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.skeleton-card {
+  padding: 20px;
+  border: 1px solid var(--color-line-soft);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,253,247,0.92));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.empty-state-icon-wrap {
+  margin-bottom: 16px;
+  color: var(--color-line);
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+}
+
+.empty-state .eyebrow {
+  margin-bottom: 4px;
+}
+
+.empty-state .muted {
+  max-width: 400px;
+  margin: 0 auto 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.empty-state-action {
+  margin-top: 8px;
+}
+
 @media (max-width: 768px) {
   .data-table {
     display: block;
