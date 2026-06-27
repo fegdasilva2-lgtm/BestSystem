@@ -30,14 +30,15 @@ stable
 security definer
 set search_path = public
 as $$
-  select contract_id
-  from public.user_contract_access
-  where user_id = auth.uid()
+  select uca.contract_id
+  from public.user_contract_access uca
+  where uca.user_id = auth.uid()
   union
-  select id
-  from public.contracts
-  where tenant_id = public.current_tenant_id()
-    and public.current_role() not in ('cliente_gestor', 'solicitante', 'fornecedor');
+  select c.id
+  from public.contracts c
+  join public.users_profile up on up.tenant_id = c.tenant_id
+  where up.id = auth.uid()
+    and up.role not in ('cliente_gestor', 'solicitante', 'fornecedor');
 $$;
 
 -- Verifica se o role atual e externo
@@ -48,7 +49,11 @@ stable
 security definer
 set search_path = public
 as $$
-  select public.current_role() in ('cliente_gestor', 'solicitante', 'fornecedor');
+  select exists (
+    select 1 from public.users_profile
+    where id = auth.uid()
+    and role in ('cliente_gestor', 'solicitante', 'fornecedor')
+  );
 $$;
 
 -- =====================================================================

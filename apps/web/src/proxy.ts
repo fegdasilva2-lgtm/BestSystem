@@ -74,6 +74,31 @@ export async function proxy(request: NextRequest) {
     return redirectResponse;
   }
 
+  // Roles externos (cliente_gestor, solicitante, fornecedor) nao acessam /admin
+  const externalRoles = ["cliente_gestor", "solicitante", "fornecedor"];
+  const { data: roleData } = await supabase
+    .from("users_profile")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (roleData?.role && externalRoles.includes(roleData.role)) {
+    if (request.nextUrl.pathname.startsWith("/admin")) {
+      const portalUrl = request.nextUrl.clone();
+      portalUrl.pathname = "/portal";
+      return NextResponse.redirect(portalUrl);
+    }
+  }
+
+  // Roles internos nao acessam /portal (vao para /admin)
+  if (roleData?.role && !externalRoles.includes(roleData.role)) {
+    if (request.nextUrl.pathname.startsWith("/portal") && !request.nextUrl.pathname.startsWith("/admin")) {
+      const adminUrl = request.nextUrl.clone();
+      adminUrl.pathname = "/admin";
+      return NextResponse.redirect(adminUrl);
+    }
+  }
+
   return response;
 }
 

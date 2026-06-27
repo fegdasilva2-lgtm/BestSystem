@@ -11,6 +11,10 @@ export default async function AdminDashboard() {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) redirect("/login");
 
+  // Roles externos vao para o portal
+  const externalRoles = ["cliente_gestor", "solicitante", "fornecedor"];
+  if (externalRoles.includes(profile.role)) redirect("/portal");
+
   const supabase = await createSupabaseServer();
   const tenantId = profile.tenant.id;
 

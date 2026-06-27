@@ -67,11 +67,15 @@ export default async function LoginPage({
   searchParams?: { error?: string; next?: string; created?: string };
 }) {
   const profile = await getSessionProfile();
-  const next = searchParams?.next && searchParams.next.startsWith("/") ? searchParams.next : "/admin";
 
   if (profile?.active && profile.tenant) {
-    redirect(next);
+    const externalRoles = ["cliente_gestor", "solicitante", "fornecedor"];
+    const isExternal = externalRoles.includes(profile.role);
+    const target = searchParams?.next && searchParams.next.startsWith("/") ? searchParams.next : (isExternal ? "/portal" : "/admin");
+    redirect(target);
   }
+
+  const next = searchParams?.next && searchParams.next.startsWith("/") ? searchParams.next : "/admin";
 
   return (
     <main className="login-shell">
