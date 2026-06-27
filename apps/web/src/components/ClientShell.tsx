@@ -10,6 +10,7 @@ type ClientShellProps = {
   user: {
     name: string;
     roleLabel: string;
+    role?: string;
     tenantName: string;
   } | null;
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export function ClientShell({ logoutAction, user, children }: ClientShellProps) 
         onToggle={toggle}
       />
 
-      <Sidebar collapsed={collapsed} />
+      <Sidebar collapsed={collapsed} role={user?.role} />
 
       <div className="main-area">
         <BreadcrumbBar />

@@ -113,6 +113,16 @@ function ImportIcon() {
   );
 }
 
+function InfoIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  );
+}
+
 // ── Seções fixas ──
 
 const sections: SidebarSection[] = [
@@ -147,9 +157,10 @@ const sections: SidebarSection[] = [
 
 interface SidebarProps {
   collapsed: boolean;
+  role?: string;
 }
 
-export function Sidebar({ collapsed }: SidebarProps) {
+export function Sidebar({ collapsed, role }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
@@ -157,15 +168,22 @@ export function Sidebar({ collapsed }: SidebarProps) {
     return pathname.startsWith(href);
   };
 
+  const adminItems = [
+    ...sections[2].items,
+    ...(role === "super_admin_saas"
+      ? [{ href: "/admin/sobre", label: "Sobre", icon: <InfoIcon /> }]
+      : []),
+  ];
+
   return (
     <nav
       className={`sidebar${collapsed ? " collapsed" : ""}`}
       aria-label="Navegação principal"
     >
-      {sections.map((section) => (
+      {sections.map((section, si) => (
         <div key={section.label}>
           <div className="sidebar-section-label">{section.label}</div>
-          {section.items.map((item) => (
+          {(si === 2 ? adminItems : section.items).map((item) => (
             <Link
               key={item.href}
               href={item.href}

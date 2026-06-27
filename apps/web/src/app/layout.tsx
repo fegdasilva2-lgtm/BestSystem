@@ -56,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               ? {
                   name: profile.name,
                   roleLabel: roleLabels[profile.role],
+                  role: profile.role,
                   tenantName: profile.tenant.name
                 }
               : null
