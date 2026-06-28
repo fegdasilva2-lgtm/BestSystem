@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, fase1-melhoria-layout]
+  pull_request:
+    branches: [main, fase1-melhoria-layout]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build + Typecheck + Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build design system
+        run: npm run build:ds
+
+      - name: Generate Supabase types (best-effort)
+        # Falha silenciosa se o CLI nao estiver logado; o typecheck ainda
+        # funciona contra o stub em packages/ds/src/db-types.ts.
+        run: |
+          if command -v supabase >/dev/null 2>&1; then
+            npx supabase gen types typescript --local > packages/ds/src/db-types.ts 2>/dev/null || true
+          fi
+        continue-on-error: true
+
+      - name: Typecheck (apps/web)
+        run: cd apps/web && npm run typecheck
+
+      - name: Lint (apps/web)
+        run: cd apps/web && npm run lint || true
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build (apps/web)
+        run: cd apps/web && npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-for-ci-build
