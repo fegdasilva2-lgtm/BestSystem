@@ -436,7 +436,7 @@ kbd {
   width: 100%;
 }
 
-/* ── Botao hamburger (mobile) — escondido em desktop ── */
+/* ── Botão hamburger (mobile) — escondido em desktop ── */
 .hamburger-btn {
   width: 40px;
   height: 40px;
@@ -452,6 +452,36 @@ kbd {
 }
 .hamburger-btn:hover { background: var(--color-ink-wash); }
 .hamburger-btn svg { width: 20px; height: 20px; color: var(--color-ink-soft); }
+
+/* ── Toggle de tema (light/dark/system) ── */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.theme-toggle-placeholder {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+}
 
 /* ── Overlay do drawer mobile ── */
 .sidebar-overlay {

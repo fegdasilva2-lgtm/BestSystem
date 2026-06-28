@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { logout } from "@/app/auth/actions";
 import { ClientShell } from "@/components/ClientShell";
+import { ThemeScript } from "@/components/ThemeScript";
 import { getSessionProfile, roleLabels } from "@/lib/auth";
 import { colors } from "@predialops/ds/tokens";
 import "./globals.css";
@@ -37,7 +38,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: colors.blueprintInk
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: colors.blueprintInk },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1117" },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -47,7 +51,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="pt-BR"
       className={`${spaceGrotesk.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <ThemeScript />
+      </head>
       <body>
         <ClientShell
           logoutAction={logout}

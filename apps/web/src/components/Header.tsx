@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 type HeaderUser = {
   name: string;
@@ -93,6 +94,7 @@ export function Header({
         </div>
 
         <div className="header-actions">
+          <ThemeToggle />
           {user ? (
             <>
               <Link className="user-pill" href="/admin/users">
