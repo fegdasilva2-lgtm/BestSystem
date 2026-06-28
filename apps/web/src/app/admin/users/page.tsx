@@ -92,14 +92,14 @@ export default async function UsersPage({
                 <strong>{profile.tenant.name}</strong>
                 <small className="muted">Tenant ativo</small>
               </span>
-              <span className="status-pill">{profile.tenant.status}</span>
+              <Badge label={profile.tenant.status} variant="ok" />
             </div>
             <div className="profile-row">
               <span>
                 <strong>{profile.tenant.plan}</strong>
                 <small className="muted">Plano contratado</small>
               </span>
-              <span className="status-pill">RLS</span>
+              <Badge label="RLS" variant="muted" />
             </div>
           </div>
         </aside>
@@ -110,7 +110,7 @@ export default async function UsersPage({
               <p className="eyebrow">Tenant</p>
               <h2>Usuários provisionados</h2>
             </div>
-            <span className="status-pill">{activeCount}/{list.length} ativos</span>
+            <Badge label={`${activeCount}/${list.length} ativos`} variant="neutral" />
           </div>
           {error ? <p className="form-error">{error.message}</p> : null}
           <div className="profile-list">
