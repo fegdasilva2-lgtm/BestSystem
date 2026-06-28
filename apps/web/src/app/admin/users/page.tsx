@@ -2,6 +2,8 @@ import { createUserProfile } from "@/app/admin/users/actions";
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { canManageUsers } from "@/lib/rbac-matrix";
+import { ForceLogoutButton } from "@/components/ForceLogoutButton";
+import { forceLogout } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
 
 const editableRoles: UserRole[] = [
@@ -27,10 +29,21 @@ function initials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Wrapper de forceLogout que aceita FormData (para uso direto em <form action>).
+ * Le o userId do campo hidden e delega para a server action typed.
+ */
+async function forceLogoutAction(formData: FormData) {
+  "use server";
+  const userId = String(formData.get("userId") || "");
+  if (!userId) return;
+  await forceLogout(userId);
+}
+
 export default async function UsersPage({
   searchParams
 }: {
-  searchParams?: { error?: string; created?: string };
+  searchParams?: { error?: string; created?: string; ok?: string };
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
@@ -107,6 +120,13 @@ export default async function UsersPage({
                 <span className={`status-pill ${user.active ? "" : "danger-pill"}`}>
                   {user.active ? "ativo" : "inativo"}
                 </span>
+                {canManageUsers(profile.role) && user.id !== profile.authUserId ? (
+                  <ForceLogoutButton
+                    action={forceLogoutAction}
+                    userId={user.id}
+                    userName={user.name}
+                  />
+                ) : null}
               </div>
             ))}
             {!error && list.length === 0 ? <p className="muted">Nenhum usuário visível para este tenant.</p> : null}
@@ -125,6 +145,7 @@ export default async function UsersPage({
           </div>
           {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
           {searchParams?.created ? <p className="status-pill">Criado: {searchParams.created}</p> : null}
+          {searchParams?.ok ? <p className="status-pill">{searchParams.ok}</p> : null}
           <form action={createUserProfile} className="form-grid">
             <label className="field">
               <span>Nome</span>
