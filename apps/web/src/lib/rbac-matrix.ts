@@ -40,7 +40,7 @@ export const ROUTE_ACCESS: readonly RouteAccessRule[] = [
   // ── Setup / cross-tenant ──
   { prefix: "/setup", allow: ["super_admin_saas"] },
   { prefix: "/admin/tenants", allow: ["super_admin_saas"] },
-  { prefix: "/admin/audit", allow: ["super_admin_saas"] },
+  { prefix: "/admin/audit", allow: ["super_admin_saas", "auditor"] },
 
   // ── Hub admin ──
   { prefix: "/admin", allow: [
