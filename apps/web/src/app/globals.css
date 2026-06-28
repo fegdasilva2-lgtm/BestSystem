@@ -2,6 +2,10 @@
   /* ── Prancheta de obra ──
      Dominância concrete + blueprint-ink, ÚNICO acento safety (amarelo NR-23),
      redline só para erro/reprovado. Sem washes pastel — densidade técnica. */
+
+  /* ── Primitivos (paleta bruta) ──
+     Nao usar diretamente em componentes; usar os semanticos abaixo.
+     Mantidos por compatibilidade — migrar gradualmente. */
   --color-blueprint-ink: #0b1f3a;
   --color-blueprint-deep: #0f2545;
   --color-ink: var(--color-blueprint-ink);
@@ -28,6 +32,37 @@
   --color-danger-wash: rgba(195, 48, 36, 0.1);
   --color-ok-wash: rgba(47, 107, 79, 0.12);
   --color-ink-wash: rgba(11, 31, 58, 0.08);
+
+  /* ── Semanticos (camada de tema) ──
+     Estes sao os que componentes DEVEM usar. Espelham os primitivos
+     em light mode; sao redefinidos em [data-theme="dark"].
+     Permite trocar o tema inteiro sem tocar nos componentes. */
+  --bg-canvas: var(--color-paper);          /* fundo do body (atrás de tudo) */
+  --bg-app: var(--color-concrete);          /* fundo do html */
+  --bg-panel: var(--color-panel);           /* superficie de paineis/cards */
+  --bg-panel-strong: var(--color-panel-strong); /* superficie elevada (modais) */
+  --bg-input: #fcfbf6;                      /* fundo de inputs */
+  --bg-header: rgba(255, 253, 247, 0.92);   /* header com backdrop blur */
+  --bg-sidebar: rgba(250, 249, 244, 0.46);  /* sidebar translucida */
+  --bg-breadcrumb: rgba(255, 253, 247, 0.78);
+  --bg-hover: var(--color-ink-wash);        /* hover generico */
+  --bg-active: rgba(242, 193, 46, 0.16);    /* item ativo sidebar */
+
+  --text-primary: var(--color-blueprint-ink);   /* texto principal */
+  --text-secondary: var(--color-ink-soft);      /* texto com peso reduzido */
+  --text-muted: var(--color-muted);             /* labels, captions */
+  --text-inverse: #fffdf7;                      /* texto sobre fundo escuro */
+  --text-on-accent: var(--color-blueprint-ink); /* texto sobre safety */
+
+  --border-default: rgba(11, 31, 58, 0.1);
+  --border-strong: rgba(11, 31, 58, 0.14);
+  --border-subtle: var(--color-line-soft);
+  --border-input: var(--color-line);
+  --border-focus: var(--color-safety-deep);
+
+  --accent: var(--color-safety);
+  --accent-deep: var(--color-safety-deep);
+  --accent-wash: rgba(242, 193, 46, 0.16);
 
   --radius-xl: 28px;
   --radius-lg: 22px;
@@ -65,16 +100,16 @@
 
 html {
   min-width: 320px;
-  background: var(--color-concrete);
+  background: var(--bg-app);
 }
 
 body {
   margin: 0;
-  color: var(--color-ink);
+  color: var(--text-primary);
   background:
     radial-gradient(900px 420px at 18% -12%, rgba(11, 31, 58, 0.05), transparent 62%),
     radial-gradient(680px 360px at 96% 4%, rgba(242, 193, 46, 0.08), transparent 58%),
-    linear-gradient(180deg, #f8f7f2 0, var(--color-concrete) 420px, var(--color-paper) 100%);
+    linear-gradient(180deg, var(--bg-canvas) 0, var(--bg-app) 420px, var(--bg-canvas) 100%);
 }
 
 a {
