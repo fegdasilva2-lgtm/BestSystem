@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { canAccess, type UserRole } from "@/lib/rbac-matrix";
 
 // ── Tipos ──
 
@@ -113,16 +114,6 @@ function ImportIcon() {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  );
-}
-
 // ── Seções fixas ──
 
 const sections: SidebarSection[] = [
@@ -157,33 +148,41 @@ const sections: SidebarSection[] = [
 
 interface SidebarProps {
   collapsed: boolean;
-  role?: string;
+  role?: UserRole;
 }
 
+/**
+ * Sidebar filtra todos os itens usando canAccess() da matriz RBAC.
+ * Quando `role` nao e fornecido (sessao publica) a sidebar nao renderiza.
+ * Secoes que ficarem vazias apos o filtro sao omitidas para nao exibir
+ * cabecalhos orfaos.
+ */
 export function Sidebar({ collapsed, role }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
-    return pathname.startsWith(href);
+    return pathname.startsWith(href + "/") || pathname === href;
   };
 
-  const adminItems = [
-    ...sections[2].items,
-    ...(role === "super_admin_saas"
-      ? [{ href: "/admin/sobre", label: "Sobre", icon: <InfoIcon /> }]
-      : []),
-  ];
+  if (!role) return null;
+
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => canAccess(role, item.href))
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <nav
       className={`sidebar${collapsed ? " collapsed" : ""}`}
       aria-label="Navegação principal"
     >
-      {sections.map((section, si) => (
+      {visibleSections.map((section) => (
         <div key={section.label}>
           <div className="sidebar-section-label">{section.label}</div>
-          {(si === 2 ? adminItems : section.items).map((item) => (
+          {section.items.map((item) => (
             <Link
               key={item.href}
               href={item.href}

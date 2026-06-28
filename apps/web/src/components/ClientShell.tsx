@@ -4,13 +4,14 @@ import { useState, useCallback } from "react";
 import { Header } from "./Header";
 import { BreadcrumbBar } from "./BreadcrumbBar";
 import { Sidebar } from "./Sidebar";
+import type { UserRole } from "@/lib/auth";
 
 type ClientShellProps = {
   logoutAction: (formData: FormData) => void | Promise<void>;
   user: {
     name: string;
     roleLabel: string;
-    role?: string;
+    role: UserRole;
     tenantName: string;
   } | null;
   children: React.ReactNode;
