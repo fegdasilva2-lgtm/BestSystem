@@ -104,6 +104,17 @@ function UsersIcon() {
   );
 }
 
+function AuditIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <line x1="9" y1="13" x2="15" y2="13" />
+      <line x1="9" y1="17" x2="13" y2="17" />
+    </svg>
+  );
+}
+
 function ImportIcon() {
   return (
     <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -139,6 +150,7 @@ const sections: SidebarSection[] = [
     label: "Admin",
     items: [
       { href: "/admin/users", label: "Acessos", icon: <UsersIcon /> },
+      { href: "/admin/audit", label: "Auditoria", icon: <AuditIcon /> },
       { href: "/admin/import", label: "Importação", icon: <ImportIcon /> },
     ],
   },
