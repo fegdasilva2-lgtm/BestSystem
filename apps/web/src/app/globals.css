@@ -69,9 +69,9 @@
   --radius-md: 14px;
   --radius-sm: 11px;
 
-  --shadow: 0 24px 70px -36px rgba(11, 31, 58, 0.34), 0 10px 26px -22px rgba(11, 31, 58, 0.24);
-  --shadow-soft: 0 16px 44px -32px rgba(11, 31, 58, 0.3), 0 1px 0 rgba(255, 255, 255, 0.72) inset;
-  --shadow-pop: 0 38px 90px -34px rgba(11, 31, 58, 0.56), 0 12px 36px -30px rgba(11, 31, 58, 0.52);
+  --shadow: 0 12px 32px -16px rgba(11, 31, 58, 0.28), 0 4px 12px -8px rgba(11, 31, 58, 0.18);
+  --shadow-soft: 0 4px 16px -8px rgba(11, 31, 58, 0.18), 0 1px 0 rgba(255, 255, 255, 0.72) inset;
+  --shadow-pop: 0 20px 48px -20px rgba(11, 31, 58, 0.42), 0 8px 20px -12px rgba(11, 31, 58, 0.32);
 
   --focus-ring: 0 0 0 4px rgba(242, 193, 46, 0.28), 0 0 0 1px var(--color-blueprint-ink);
 
@@ -137,9 +137,9 @@
     --color-ok-wash: rgba(78, 195, 138, 0.14);
     --color-ink-wash: rgba(248, 224, 168, 0.08);
 
-    --shadow: 0 24px 70px -36px rgba(0, 0, 0, 0.7), 0 10px 26px -22px rgba(0, 0, 0, 0.5);
-    --shadow-soft: 0 16px 44px -32px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(248, 224, 168, 0.06) inset;
-    --shadow-pop: 0 38px 90px -34px rgba(0, 0, 0, 0.85), 0 12px 36px -30px rgba(0, 0, 0, 0.7);
+    --shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6), 0 4px 12px -8px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 4px 16px -8px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(248, 224, 168, 0.06) inset;
+    --shadow-pop: 0 20px 48px -20px rgba(0, 0, 0, 0.75), 0 8px 20px -12px rgba(0, 0, 0, 0.55);
 
     --focus-ring: 0 0 0 4px rgba(248, 224, 168, 0.32), 0 0 0 1px var(--accent);
 
@@ -190,9 +190,9 @@
   --color-ok-wash: rgba(78, 195, 138, 0.14);
   --color-ink-wash: rgba(248, 224, 168, 0.08);
 
-  --shadow: 0 24px 70px -36px rgba(0, 0, 0, 0.7), 0 10px 26px -22px rgba(0, 0, 0, 0.5);
-  --shadow-soft: 0 16px 44px -32px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(248, 224, 168, 0.06) inset;
-  --shadow-pop: 0 38px 90px -34px rgba(0, 0, 0, 0.85), 0 12px 36px -30px rgba(0, 0, 0, 0.7);
+  --shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6), 0 4px 12px -8px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 4px 16px -8px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(248, 224, 168, 0.06) inset;
+  --shadow-pop: 0 20px 48px -20px rgba(0, 0, 0, 0.75), 0 8px 20px -12px rgba(0, 0, 0, 0.55);
 
   --focus-ring: 0 0 0 4px rgba(248, 224, 168, 0.32), 0 0 0 1px var(--accent);
 
@@ -859,7 +859,7 @@ kbd {
   border: 1px solid var(--border-strong);
   text-decoration: none;
   font-size: 13px;
-  font-weight: 850;
+  font-weight: 700;
   white-space: nowrap;
   transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background 160ms ease, border-color 160ms ease;
 }
@@ -1207,7 +1207,7 @@ kbd {
   border-radius: var(--radius-sm);
   color: #fffdf7;
   background: var(--color-blueprint-ink);
-  font-weight: 950;
+  font-weight: 800;
 }
 
 .form-card {
@@ -1226,7 +1226,7 @@ kbd {
 
 .form-section legend {
   padding: 0 8px;
-  font-weight: 950;
+  font-weight: 800;
 }
 
 .form-grid {
@@ -1247,7 +1247,7 @@ kbd {
 .field span {
   color: var(--color-muted);
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -1543,7 +1543,7 @@ kbd {
 .role-lane-head span {
   color: var(--color-blueprint-ink);
   font-size: 18px;
-  font-weight: 950;
+  font-weight: 800;
 }
 
 .role-lane-head strong {
@@ -1584,7 +1584,7 @@ kbd {
   background: #fffdf7;
   border: 1px solid rgba(11, 31, 58, 0.1);
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 700;
 }
 
 .profile-list {
@@ -1658,7 +1658,7 @@ kbd {
   background: #eef3ea;
   border: 1px solid rgba(11, 31, 58, 0.12);
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 700;
 }
 
 .profile-self-head {
@@ -1740,7 +1740,7 @@ kbd {
   background: #ffffff;
   color: var(--color-muted);
   font-size: 13px;
-  font-weight: 850;
+  font-weight: 700;
 }
 
 .block-toggle input {
@@ -2182,7 +2182,7 @@ kbd {
   padding: 10px 14px;
   text-align: left;
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
