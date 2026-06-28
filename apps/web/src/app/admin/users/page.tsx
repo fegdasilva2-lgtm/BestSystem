@@ -1,6 +1,7 @@
 import { createUserProfile } from "@/app/admin/users/actions";
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase-server";
+import { canManageUsers } from "@/lib/rbac-matrix";
 import { redirect } from "next/navigation";
 
 const editableRoles: UserRole[] = [
@@ -18,10 +19,6 @@ const editableRoles: UserRole[] = [
   "auditor",
   "fornecedor"
 ];
-
-function canManageUsers(role: UserRole) {
-  return role === "super_admin_saas" || role === "admin_org" || role === "gestor_facilities";
-}
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);

@@ -1,5 +1,6 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile, type UserRole } from "@/lib/auth";
+import { canManageUsers } from "./rbac-matrix";
 
 /**
  * Roles que veem apenas contratos vinculados via user_contract_access.
@@ -95,7 +96,8 @@ export async function withContractFilter<T>(
 
 /**
  * Vincula um usuario a um contrato.
- * Apenas admin_org, gestor_facilities ou super_admin_saas podem executar.
+ * Apenas admin_org ou super_admin_saas podem executar (gestor_facilities
+ * opera o tenant mas nao administra usuarios).
  */
 export async function linkUserToContract(
   userId: string,
@@ -103,7 +105,7 @@ export async function linkUserToContract(
 ): Promise<{ error?: string }> {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) return { error: "Sem sessao ativa." };
-  if (!["super_admin_saas", "admin_org", "gestor_facilities"].includes(profile.role)) {
+  if (!canManageUsers(profile.role)) {
     return { error: "Sem permissao para vincular usuarios a contratos." };
   }
 
@@ -129,7 +131,7 @@ export async function unlinkUserFromContract(
 ): Promise<{ error?: string }> {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) return { error: "Sem sessao ativa." };
-  if (!["super_admin_saas", "admin_org", "gestor_facilities"].includes(profile.role)) {
+  if (!canManageUsers(profile.role)) {
     return { error: "Sem permissao para desvincular usuarios de contratos." };
   }
 
