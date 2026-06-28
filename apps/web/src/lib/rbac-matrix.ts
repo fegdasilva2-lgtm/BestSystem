@@ -1,16 +1,20 @@
 import type { UserRole } from "./auth";
 
+// Re-exporta UserRole para que consumidores da matriz nao precisem
+// importar de "./auth" e "./rbac-matrix" ao mesmo tempo.
+export type { UserRole };
+
 /**
  * Matriz central de autorizacao por rota.
  *
  * FONTE UNICA DE VERDADE para o que cada perfil pode acessar.
- * Derivada de docs/PERFIS.md (secao "Rotas vs Perfis", linhas 118-141).
+ * Derivada de docs/PERFIS.md (secao Rotas vs Perfis, linhas 118-141).
  *
  * Consumida por:
  *   - proxy.ts                       (gate de borda no Next.js)
  *   - components/Sidebar.tsx         (esconder itens sem acesso)
- *   - app/admin/**/page.tsx          (guards de pagina, quando necessario)
- *   - app/admin/**/actions.ts        (guards de server action)
+ *   - app/admin/(page.tsx)           (guards de pagina, quando necessario)
+ *   - app/admin/(actions.ts)         (guards de server action)
  *
  * Regras:
  *   - Prefixo mais especifico vence (longest match).
