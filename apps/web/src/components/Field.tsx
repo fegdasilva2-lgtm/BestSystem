@@ -29,6 +29,9 @@ interface FieldProps {
   min?: string | number;
   max?: string | number;
   step?: string | number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
   autoFocus?: boolean;
   /** Override explicito - senao inferido do name+type. */
   inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
@@ -131,6 +134,9 @@ export function Field({
   min,
   max,
   step,
+  minLength,
+  maxLength,
+  pattern,
   autoFocus,
   inputMode,
   autoComplete,
@@ -157,6 +163,9 @@ export function Field({
         min={min}
         max={max}
         step={step}
+        minLength={minLength}
+        maxLength={maxLength}
+        pattern={pattern}
         autoFocus={autoFocus}
         disabled={disabled}
         inputMode={inf.inputMode}

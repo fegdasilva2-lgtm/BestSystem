@@ -3,6 +3,8 @@ import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { canManageUsers } from "@/lib/rbac-matrix";
 import { ForceLogoutButton } from "@/components/ForceLogoutButton";
+import { Field } from "@/components/Field";
+import { Select } from "@/components/Select";
 import { forceLogout } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
 
@@ -147,26 +149,22 @@ export default async function UsersPage({
           {searchParams?.created ? <p className="status-pill">Criado: {searchParams.created}</p> : null}
           {searchParams?.ok ? <p className="status-pill">{searchParams.ok}</p> : null}
           <form action={createUserProfile} className="form-grid">
-            <label className="field">
-              <span>Nome</span>
-              <input name="name" required placeholder="Camila Torres" />
-            </label>
-            <label className="field">
-              <span>E-mail</span>
-              <input name="email" type="email" required placeholder="camila@imcfacilities.com.br" />
-            </label>
-            <label className="field">
-              <span>Senha temporária</span>
-              <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
-            </label>
-            <label className="field">
-              <span>Perfil</span>
-              <select name="role" defaultValue="tecnico">
-                {editableRoles.map((role) => (
-                  <option key={role} value={role}>{roleLabels[role]}</option>
-                ))}
-              </select>
-            </label>
+            <Field name="name" label="Nome" required placeholder="Camila Torres" />
+            <Field name="email" label="E-mail" required placeholder="camila@imcfacilities.com.br" />
+            <Field
+              name="password"
+              label="Senha temporária"
+              type="password"
+              required
+              minLength={8}
+              placeholder="Mínimo 8 caracteres"
+            />
+            <Select
+              name="role"
+              label="Perfil"
+              defaultValue="tecnico"
+              options={editableRoles.map((r) => ({ value: r, label: roleLabels[r] }))}
+            />
             <div className="form-actions field full">
               <button className="primary-button" type="submit">Criar usuário</button>
             </div>

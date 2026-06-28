@@ -1,5 +1,6 @@
 import { bootstrapFirstAdmin } from "@/app/setup/actions";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
+import { Field } from "@/components/Field";
 import { redirect } from "next/navigation";
 
 export default async function SetupPage({
@@ -45,18 +46,16 @@ export default async function SetupPage({
           {setupError ? <p className="form-error">{setupError}</p> : null}
           {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
           <input type="hidden" name="setup_secret" value={searchParams?.secret ?? ""} />
-          <label className="field">
-            <span>Nome</span>
-            <input name="name" required placeholder="Administrador PredialOps" />
-          </label>
-          <label className="field">
-            <span>E-mail</span>
-            <input name="email" type="email" required placeholder="admin@empresa.com.br" />
-          </label>
-          <label className="field">
-            <span>Senha</span>
-            <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
-          </label>
+          <Field name="name" label="Nome" required placeholder="Administrador PredialOps" />
+          <Field name="email" label="E-mail" required placeholder="admin@empresa.com.br" />
+          <Field
+            name="password"
+            label="Senha"
+            type="password"
+            required
+            minLength={8}
+            placeholder="Mínimo 8 caracteres"
+          />
           <div className="form-actions">
             <button className="primary-button" type="submit" disabled={Boolean(setupError)}>
               Criar administrador

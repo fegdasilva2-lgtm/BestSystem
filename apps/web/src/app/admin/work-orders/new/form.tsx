@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createWorkOrder } from "../actions";
+import { Field } from "@/components/Field";
+import { Select } from "@/components/Select";
 
 export function NewWorkOrderForm({ contracts }: { contracts: { id: string; code: string }[] }) {
   const router = useRouter();
@@ -25,48 +27,46 @@ export function NewWorkOrderForm({ contracts }: { contracts: { id: string; code:
       {error && <p className="form-error" style={{ marginBottom: 12 }}>{error}</p>}
 
       <div className="form-grid two">
-        <label className="field">
-          <span>Tipo</span>
-          <select name="type" required defaultValue="">
-            <option value="" disabled>Selecione...</option>
-            <option value="preventiva">Preventiva</option>
-            <option value="corretiva">Corretiva</option>
-            <option value="corretiva_programada">Corretiva programada</option>
-            <option value="preditiva">Preditiva</option>
-            <option value="inspecao">Inspeção</option>
-            <option value="ronda">Ronda</option>
-            <option value="melhoria">Melhoria</option>
-            <option value="instalacao">Instalação</option>
-            <option value="emergencia">Emergência</option>
-            <option value="avulsa">Avulsa</option>
-          </select>
-        </label>
+        <Select
+          name="type"
+          label="Tipo"
+          required
+          placeholder="Selecione..."
+          options={[
+            { value: "preventiva", label: "Preventiva" },
+            { value: "corretiva", label: "Corretiva" },
+            { value: "corretiva_programada", label: "Corretiva programada" },
+            { value: "preditiva", label: "Preditiva" },
+            { value: "inspecao", label: "Inspeção" },
+            { value: "ronda", label: "Ronda" },
+            { value: "melhoria", label: "Melhoria" },
+            { value: "instalacao", label: "Instalação" },
+            { value: "emergencia", label: "Emergência" },
+            { value: "avulsa", label: "Avulsa" },
+          ]}
+        />
 
-        <label className="field">
-          <span>Prioridade</span>
-          <select name="priority" required defaultValue="">
-            <option value="" disabled>Selecione...</option>
-            <option value="baixa">Baixa</option>
-            <option value="media">Média</option>
-            <option value="alta">Alta</option>
-            <option value="critica">Crítica</option>
-          </select>
-        </label>
+        <Select
+          name="priority"
+          label="Prioridade"
+          required
+          placeholder="Selecione..."
+          options={[
+            { value: "baixa", label: "Baixa" },
+            { value: "media", label: "Média" },
+            { value: "alta", label: "Alta" },
+            { value: "critica", label: "Crítica" },
+          ]}
+        />
 
-        <label className="field">
-          <span>Contrato</span>
-          <select name="contract_id" defaultValue="">
-            <option value="">Nenhum</option>
-            {contracts.map((c) => (
-              <option key={c.id} value={c.id}>{c.code}</option>
-            ))}
-          </select>
-        </label>
+        <Select
+          name="contract_id"
+          label="Contrato"
+          placeholder="Nenhum"
+          options={contracts.map((c) => ({ value: c.id, label: c.code }))}
+        />
 
-        <label className="field">
-          <span>Prazo</span>
-          <input name="due_at" type="date" />
-        </label>
+        <Field name="due_at" label="Prazo" type="date" />
 
         <label className="field full">
           <span>Descrição</span>
