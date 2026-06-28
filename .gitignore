@@ -32,6 +32,12 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Playwright
+playwright-report/
+test-results/
+playwright-results.xml
+tests/e2e/.auth/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
