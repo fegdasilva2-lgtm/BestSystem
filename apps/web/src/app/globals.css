@@ -1453,6 +1453,49 @@ kbd {
   box-shadow: 0 0 0 4px rgba(242, 193, 46, 0.22);
 }
 
+/* ── Login: painel de pilares do produto (substitui KPIs fake) ── */
+.login-ops-panel {
+  margin: 28px 0 0;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 253, 247, 0.08);
+  border: 1px solid rgba(255, 253, 247, 0.16);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.login-ops-panel .eyebrow {
+  margin-bottom: 10px;
+  color: rgba(255, 253, 247, 0.7);
+}
+.value-props {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.value-props li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 253, 247, 0.1);
+}
+.value-props li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.value-props li strong {
+  color: #ffd7c7;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.value-props li span {
+  color: rgba(255, 253, 247, 0.78);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .login-card {
   align-self: center;
   min-height: auto;

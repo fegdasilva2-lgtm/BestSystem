@@ -48,10 +48,22 @@ const trustSignals = [
   }
 ];
 
-const operationSignals = [
-  { label: "OS em campo", value: "128", tone: "ok" },
-  { label: "PMOC no prazo", value: "94%", tone: "amber" },
-  { label: "RGMs em aceite", value: "18", tone: "steel" }
+// Substitui antigos KPIs hardcoded ("128 OS", "94%") por valor-proposta
+// real: a combinacao dos 3 pilares do produto (contrato, execucao, aceite).
+// Mantem o espaco visual sem mentir com dados ficticios.
+const valueProps = [
+  {
+    title: "Contrato",
+    detail: "Entidade central do produto — clientes, sites, ativos e OS orbitam o contrato."
+  },
+  {
+    title: "Execucao",
+    detail: "PMOC, OS e checklist em campo com PWA offline-first e evidencias."
+  },
+  {
+    title: "Aceite",
+    detail: "Medicao mensal, RGM arquivado e portal do cliente para fechamento do ciclo."
+  }
 ];
 
 const laneColors: Record<string, string> = {
@@ -100,19 +112,16 @@ export default async function LoginPage({
             ))}
           </ul>
 
-          <div className="login-ops-panel" aria-label="Resumo operacional">
-            <div className="ops-panel-head">
-              <span>Operação hoje</span>
-              <strong>sa-east-1</strong>
-            </div>
-            <div className="ops-metrics">
-              {operationSignals.map((signal) => (
-                <span className={`ops-metric ${signal.tone}`} key={signal.label}>
-                  <strong>{signal.value}</strong>
-                  <small>{signal.label}</small>
-                </span>
+          <div className="login-ops-panel" aria-label="Pilares do produto">
+            <p className="eyebrow">Pilares do produto</p>
+            <ul className="value-props">
+              {valueProps.map((prop) => (
+                <li key={prop.title}>
+                  <strong>{prop.title}</strong>
+                  <span>{prop.detail}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
 
