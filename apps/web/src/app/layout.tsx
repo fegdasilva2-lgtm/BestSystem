@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { ViewTransition } from "react";
 import { Space_Grotesk, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { logout } from "@/app/auth/actions";
 import { ClientShell } from "@/components/ClientShell";
@@ -57,21 +58,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeScript />
       </head>
       <body>
-        <ClientShell
-          logoutAction={logout}
-          user={
-            profile?.active && profile.tenant
-              ? {
-                  name: profile.name,
-                  roleLabel: roleLabels[profile.role],
-                  role: profile.role,
-                  tenantName: profile.tenant.name
-                }
-              : null
-          }
-        >
-          {children}
-        </ClientShell>
+        <ViewTransition default="auto">
+          <ClientShell
+            logoutAction={logout}
+            user={
+              profile?.active && profile.tenant
+                ? {
+                    name: profile.name,
+                    roleLabel: roleLabels[profile.role],
+                    role: profile.role,
+                    tenantName: profile.tenant.name
+                  }
+                : null
+            }
+          >
+            {children}
+          </ClientShell>
+        </ViewTransition>
       </body>
     </html>
   );
