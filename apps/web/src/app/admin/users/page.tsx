@@ -1,6 +1,12 @@
 import { createUserProfile } from "@/app/admin/users/actions";
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase-server";
+import { canManageUsers } from "@/lib/rbac-matrix";
+import { ForceLogoutButton } from "@/components/ForceLogoutButton";
+import { Field } from "@/components/Field";
+import { Select } from "@/components/Select";
+import { Badge } from "@/components/Badge";
+import { forceLogout } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
 
 const editableRoles: UserRole[] = [
@@ -19,10 +25,6 @@ const editableRoles: UserRole[] = [
   "fornecedor"
 ];
 
-function canManageUsers(role: UserRole) {
-  return role === "super_admin_saas" || role === "admin_org" || role === "gestor_facilities";
-}
-
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
@@ -30,10 +32,21 @@ function initials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Wrapper de forceLogout que aceita FormData (para uso direto em <form action>).
+ * Le o userId do campo hidden e delega para a server action typed.
+ */
+async function forceLogoutAction(formData: FormData) {
+  "use server";
+  const userId = String(formData.get("userId") || "");
+  if (!userId) return;
+  await forceLogout(userId);
+}
+
 export default async function UsersPage({
   searchParams
 }: {
-  searchParams?: { error?: string; created?: string };
+  searchParams?: { error?: string; created?: string; ok?: string };
 }) {
   const profile = await getSessionProfile();
   if (!profile?.active || !profile.tenant) {
@@ -68,7 +81,9 @@ export default async function UsersPage({
             <div>
               <h2>{profile.name}</h2>
               <p className="muted">{profile.email}</p>
-              <span className="role-tag">{roleLabels[profile.role]}</span>
+              <span>
+              <Badge label={roleLabels[profile.role]} variant="neutral" />
+            </span>
             </div>
           </div>
           <div className="profile-list">
@@ -77,14 +92,14 @@ export default async function UsersPage({
                 <strong>{profile.tenant.name}</strong>
                 <small className="muted">Tenant ativo</small>
               </span>
-              <span className="status-pill">{profile.tenant.status}</span>
+              <Badge label={profile.tenant.status} variant="ok" />
             </div>
             <div className="profile-row">
               <span>
                 <strong>{profile.tenant.plan}</strong>
                 <small className="muted">Plano contratado</small>
               </span>
-              <span className="status-pill">RLS</span>
+              <Badge label="RLS" variant="muted" />
             </div>
           </div>
         </aside>
@@ -95,7 +110,7 @@ export default async function UsersPage({
               <p className="eyebrow">Tenant</p>
               <h2>Usuários provisionados</h2>
             </div>
-            <span className="status-pill">{activeCount}/{list.length} ativos</span>
+            <Badge label={`${activeCount}/${list.length} ativos`} variant="neutral" />
           </div>
           {error ? <p className="form-error">{error.message}</p> : null}
           <div className="profile-list">
@@ -105,11 +120,16 @@ export default async function UsersPage({
                 <span className="user-id">
                   <strong>{user.name}</strong>
                   <small className="muted">{user.email}</small>
-                  <span className="role-tag">{roleLabels[user.role as UserRole] ?? user.role}</span>
+                  <Badge label={roleLabels[user.role as UserRole] ?? user.role} variant="neutral" />
                 </span>
-                <span className={`status-pill ${user.active ? "" : "danger-pill"}`}>
-                  {user.active ? "ativo" : "inativo"}
-                </span>
+                <Badge label={user.active ? "ativo" : "inativo"} variant={user.active ? "ok" : "danger"} />
+                {canManageUsers(profile.role) && user.id !== profile.authUserId ? (
+                  <ForceLogoutButton
+                    action={forceLogoutAction}
+                    userId={user.id}
+                    userName={user.name}
+                  />
+                ) : null}
               </div>
             ))}
             {!error && list.length === 0 ? <p className="muted">Nenhum usuário visível para este tenant.</p> : null}
@@ -128,27 +148,24 @@ export default async function UsersPage({
           </div>
           {searchParams?.error ? <p className="form-error">{searchParams.error}</p> : null}
           {searchParams?.created ? <p className="status-pill">Criado: {searchParams.created}</p> : null}
+          {searchParams?.ok ? <p className="status-pill">{searchParams.ok}</p> : null}
           <form action={createUserProfile} className="form-grid">
-            <label className="field">
-              <span>Nome</span>
-              <input name="name" required placeholder="Camila Torres" />
-            </label>
-            <label className="field">
-              <span>E-mail</span>
-              <input name="email" type="email" required placeholder="camila@imcfacilities.com.br" />
-            </label>
-            <label className="field">
-              <span>Senha temporária</span>
-              <input name="password" type="password" required minLength={8} placeholder="Mínimo 8 caracteres" />
-            </label>
-            <label className="field">
-              <span>Perfil</span>
-              <select name="role" defaultValue="tecnico">
-                {editableRoles.map((role) => (
-                  <option key={role} value={role}>{roleLabels[role]}</option>
-                ))}
-              </select>
-            </label>
+            <Field name="name" label="Nome" required placeholder="Camila Torres" />
+            <Field name="email" label="E-mail" required placeholder="camila@imcfacilities.com.br" />
+            <Field
+              name="password"
+              label="Senha temporária"
+              type="password"
+              required
+              minLength={8}
+              placeholder="Mínimo 8 caracteres"
+            />
+            <Select
+              name="role"
+              label="Perfil"
+              defaultValue="tecnico"
+              options={editableRoles.map((r) => ({ value: r, label: roleLabels[r] }))}
+            />
             <div className="form-actions field full">
               <button className="primary-button" type="submit">Criar usuário</button>
             </div>

@@ -3,6 +3,7 @@
 
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
+import { StatSparkline } from "@/components/StatSparkline";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -56,12 +57,55 @@ export default async function AdminDashboard() {
   ]);
 
   const kpis = [
-    { label: "Contratos", value: contractCount ?? 0, detail: "Cadastrados no tenant", accent: "forest", icon: "◈" },
-    { label: "Sites", value: siteCount ?? 0, detail: "Unidades operacionais", accent: "clay", icon: "◉" },
-    { label: "Ativos", value: assetCount ?? 0, detail: "Equipamentos cadastrados", accent: "amber", icon: "◎" },
-    { label: "OS abertas", value: openWoCount ?? 0, detail: "Em execução ou pendentes", accent: "coral", icon: "⟐" },
-    { label: "Medições pendentes", value: pendingMeasCount ?? 0, detail: "Aguardando aceite", accent: "steel", icon: "◎" },
-    { label: "RGMs", value: rgmCount ?? 0, detail: "Versões geradas", accent: "moss", icon: "▣" },
+    {
+      label: "Contratos",
+      value: contractCount ?? 0,
+      detail: "Cadastrados no tenant",
+      accent: "forest",
+      icon: "◈",
+      // Serie mockada — em produção viria de audit_logs ou tabela de métricas
+      trend: [3, 3, 4, 5, 5, 6, contractCount ?? 0]
+    },
+    {
+      label: "Sites",
+      value: siteCount ?? 0,
+      detail: "Unidades operacionais",
+      accent: "clay",
+      icon: "◉",
+      trend: [2, 2, 3, 3, 4, 4, siteCount ?? 0]
+    },
+    {
+      label: "Ativos",
+      value: assetCount ?? 0,
+      detail: "Equipamentos cadastrados",
+      accent: "amber",
+      icon: "◎",
+      trend: [10, 14, 18, 22, 25, 28, assetCount ?? 0]
+    },
+    {
+      label: "OS abertas",
+      value: openWoCount ?? 0,
+      detail: "Em execução ou pendentes",
+      accent: "coral",
+      icon: "⟐",
+      trend: [12, 9, 14, 11, 8, 10, openWoCount ?? 0]
+    },
+    {
+      label: "Medições pendentes",
+      value: pendingMeasCount ?? 0,
+      detail: "Aguardando aceite",
+      accent: "steel",
+      icon: "◎",
+      trend: [3, 5, 4, 6, 5, 4, pendingMeasCount ?? 0]
+    },
+    {
+      label: "RGMs",
+      value: rgmCount ?? 0,
+      detail: "Versões geradas",
+      accent: "moss",
+      icon: "▣",
+      trend: [2, 4, 5, 8, 10, 14, rgmCount ?? 0]
+    },
   ];
 
   const accentMap: Record<string, string> = {
@@ -105,6 +149,7 @@ export default async function AdminDashboard() {
             <strong>{k.value}</strong>
             <span>{k.label}</span>
             <small>{k.detail}</small>
+            <StatSparkline values={k.trend} label={`${k.label}: ultimos 7 periodos`} />
           </div>
         ))}
       </div>

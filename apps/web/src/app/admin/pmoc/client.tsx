@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { criarPmoc, registrarExecucaoPmoc, listarAlertasPmoc } from "./actions";
+import { Badge } from "@/components/Badge";
 
 interface Plan { id: string; code: string; contract_id: string; site_id: string; starts_on: string; ends_on: string; rt_name: string; rt_crea: string; rt_email: string | null; rt_phone: string | null; art_number: string; art_url: string | null; min_cleaning_frequency: string; active: boolean; }
 interface Contract { id: string; code: string; }
@@ -195,7 +196,7 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
                   {p.starts_on} a {p.ends_on} - {p.rt_name} (CREA {p.rt_crea}) - ART {p.art_number}
                 </small>
               </span>
-              <span className="status-pill">{p.active ? "ativo" : "inativo"}</span>
+              <Badge label={p.active ? "ativo" : "inativo"} variant={p.active ? "ok" : "muted"} />
             </li>
           ))}
           {plans.length === 0 ? <li className="muted">Nenhum PMOC cadastrado.</li> : null}
@@ -288,7 +289,12 @@ export default function PmocClient({ plans, contracts, sites, activities, execut
               <tr key={e.id}>
                 <td>{fmtDate(e.executed_at)}</td>
                 <td>{hvacAssets.find((h) => h.id === e.asset_id)?.code ?? e.asset_id}</td>
-                <td><span className="status-pill">{e.result}</span></td>
+                <td>
+                  <Badge
+                    label={e.result}
+                    variant={e.result === "ok" ? "ok" : e.result === "pendente" ? "warn" : "danger"}
+                  />
+                </td>
                 <td>{fmtDate(e.next_due_at)}</td>
                 <td>{e.photo_count}</td>
               </tr>

@@ -19,9 +19,12 @@
     "test:measurement": "node tests/measurement.test.mjs",
     "test:sla": "node tests/sla.test.mjs",
     "test:authorization": "node tests/authorization.test.mjs",
+    "test:rbac-matrix": "node --experimental-strip-types tests/rbac-matrix.test.mts",
     "test:pmoc": "node tests/pmoc.test.mjs",
     "test:nfse-trabalhista": "node tests/nfse-trabalhista.test.mjs",
-    "test": "npm run test:importer && npm run test:schedule && npm run test:conflict && npm run test:load && npm run test:measurement && npm run test:sla && npm run test:authorization && npm run test:pmoc && npm run test:nfse-trabalhista",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "test": "npm run test:importer && npm run test:schedule && npm run test:conflict && npm run test:load && npm run test:measurement && npm run test:sla && npm run test:authorization && npm run test:rbac-matrix && npm run test:pmoc && npm run test:nfse-trabalhista",
     "supabase:login": "supabase login",
     "supabase:create": "supabase projects create predialops-homolog --region sa-east-1 --size micro",
     "supabase:link": "supabase link --project-ref saunmtbsjwgvcwqfxhzb",
@@ -49,6 +52,7 @@
   ],
   "license": "UNLICENSED",
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "supabase": "^2.106.0"
   }
 }

@@ -2,6 +2,7 @@
 
 import { getSessionProfile, roleLabels, type UserRole } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
+import { canManageUsers } from "@/lib/rbac-matrix";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -20,10 +21,6 @@ const roles: UserRole[] = [
   "auditor",
   "fornecedor"
 ];
-
-function canManageUsers(role: UserRole) {
-  return role === "super_admin_saas" || role === "admin_org" || role === "gestor_facilities";
-}
 
 function fail(message: string): never {
   redirect(`/admin/users?error=${encodeURIComponent(message)}`);

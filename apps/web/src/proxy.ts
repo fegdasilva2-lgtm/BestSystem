@@ -1,6 +1,7 @@
-// Proxy Next.js: protege rotas privadas usando a sessao Supabase.
+// Proxy Next.js: protege rotas privadas usando a sessao Supabase + RBAC.
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { canAccess, type UserRole } from "@/lib/rbac-matrix";
 
 /**
  * Valida e sanitiza o parametro `next` para prevenir open redirect.
@@ -9,17 +10,24 @@ import { NextResponse, type NextRequest } from "next/server";
 function sanitizeNextParam(rawNext: string | null): string {
   const value = rawNext ?? "/admin";
   try {
-    // new URL com base ficticia resolve URLs relativas e absolutas
     const url = new URL(value, "http://localhost");
-    // So permite hostname localhost/127 (evita //evil.com e https://evil.com)
     if (url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
       return "/admin";
     }
     return url.pathname + url.search;
   } catch {
-    // fallback seguro
     return "/admin";
   }
+}
+
+/**
+ * Hub padrao para redirecionar um usuario apos auth/authorization check.
+ * Perfis externos (cliente/solicitante/fornecedor) vao para /portal.
+ * Demais perfis vao para /admin.
+ */
+function hubFor(role: UserRole): "/admin" | "/portal" {
+  const externalRoles: UserRole[] = ["cliente_gestor", "solicitante", "fornecedor"];
+  return externalRoles.includes(role) ? "/portal" : "/admin";
 }
 
 export async function proxy(request: NextRequest) {
@@ -40,26 +48,27 @@ export async function proxy(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const protectedRoute = request.nextUrl.pathname.startsWith("/portal")
-    || request.nextUrl.pathname.startsWith("/admin");
+  const pathname = request.nextUrl.pathname;
+  const protectedRoute = pathname.startsWith("/portal") || pathname.startsWith("/admin");
 
   if (!protectedRoute) return response;
 
   const loginUrl = request.nextUrl.clone();
   loginUrl.pathname = "/login";
-  // Sanitiza o next antes de passar adiante — evita open redirect
-  const nextParam = request.nextUrl.searchParams.get("next") ?? request.nextUrl.pathname + request.nextUrl.search;
+  const nextParam = request.nextUrl.searchParams.get("next") ?? pathname + request.nextUrl.search;
   loginUrl.searchParams.set("next", sanitizeNextParam(nextParam));
 
+  // 1. Gate de autenticacao
   if (!user) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Revogacao defensiva: se o usuario foi desativado em users_profile,
-  // bloqueia acesso mesmo que o JWT antigo ainda nao tenha expirado.
+  // 2. Revogacao defensiva: usuario desativado em users_profile e bloqueado
+  //    mesmo com JWT ainda valido. Tambem checa sessions_invalidated_at para
+  //    detectar mudanca de role/active apos emissao do JWT (claim stale).
   const { data: profile } = await supabase
     .from("users_profile")
-    .select("active")
+    .select("active, role, sessions_invalidated_at")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -74,29 +83,33 @@ export async function proxy(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Roles externos (cliente_gestor, solicitante, fornecedor) nao acessam /admin
-  const externalRoles = ["cliente_gestor", "solicitante", "fornecedor"];
-  const { data: roleData } = await supabase
-    .from("users_profile")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (roleData?.role && externalRoles.includes(roleData.role)) {
-    if (request.nextUrl.pathname.startsWith("/admin")) {
-      const portalUrl = request.nextUrl.clone();
-      portalUrl.pathname = "/portal";
-      return NextResponse.redirect(portalUrl);
+  // JWT staleness: se sessions_invalidated_at > iat, o token atual
+  // carrega claims antigos (role/active desatualizados). Forca re-login.
+  const jwtIat = (user as { iat?: number }).iat;
+  if (
+    profile.sessions_invalidated_at &&
+    typeof jwtIat === "number" &&
+    new Date(profile.sessions_invalidated_at).getTime() > jwtIat * 1000
+  ) {
+    loginUrl.searchParams.set("error", "Sua sessão foi invalidada. Faça login novamente.");
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    for (const cookie of request.cookies.getAll()) {
+      if (cookie.name.startsWith("sb-")) {
+        redirectResponse.cookies.set(cookie.name, "", { maxAge: 0, path: "/" });
+      }
     }
+    return redirectResponse;
   }
 
-  // Roles internos nao acessam /portal (vao para /admin)
-  if (roleData?.role && !externalRoles.includes(roleData.role)) {
-    if (request.nextUrl.pathname.startsWith("/portal") && !request.nextUrl.pathname.startsWith("/admin")) {
-      const adminUrl = request.nextUrl.clone();
-      adminUrl.pathname = "/admin";
-      return NextResponse.redirect(adminUrl);
-    }
+  // 3. Gate de autorizacao (RBAC) — usa a matriz central.
+  //    Se o perfil nao pode acessar o pathname, redireciona para o hub proprio
+  //    com mensagem de erro, em vez de revelar que a rota existe.
+  const role = profile.role as UserRole;
+  if (!canAccess(role, pathname)) {
+    const hub = request.nextUrl.clone();
+    hub.pathname = hubFor(role);
+    hub.searchParams.set("error", "Você não tem permissão para acessar essa área.");
+    return NextResponse.redirect(hub);
   }
 
   return response;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 type HeaderUser = {
   name: string;
@@ -13,7 +14,9 @@ type HeaderProps = {
   logoutAction: (formData: FormData) => void | Promise<void>;
   user: HeaderUser | null;
   collapsed?: boolean;
+  mobileOpen?: boolean;
   onToggle?: () => void;
+  onMobileToggle?: () => void;
 };
 
 function LogoutIcon() {
@@ -36,11 +39,41 @@ function SidebarToggleIcon() {
   );
 }
 
-export function Header({ logoutAction, user, collapsed, onToggle }: HeaderProps) {
+function HamburgerIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+export function Header({
+  logoutAction,
+  user,
+  collapsed,
+  mobileOpen,
+  onToggle,
+  onMobileToggle,
+}: HeaderProps) {
   return (
     <header className="app-header">
       <div className="app-header-inner">
         <div className="header-left">
+          {/* Botao hamburger — visivel apenas em mobile via CSS */}
+          {onMobileToggle && (
+            <button
+              className="hamburger-btn"
+              type="button"
+              aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={mobileOpen}
+              onClick={onMobileToggle}
+            >
+              <HamburgerIcon />
+            </button>
+          )}
+          {/* Botao de colapsar — visivel apenas em desktop via CSS */}
           {onToggle && (
             <button
               className="sidebar-toggle-btn"
@@ -61,6 +94,7 @@ export function Header({ logoutAction, user, collapsed, onToggle }: HeaderProps)
         </div>
 
         <div className="header-actions">
+          <ThemeToggle />
           {user ? (
             <>
               <Link className="user-pill" href="/admin/users">

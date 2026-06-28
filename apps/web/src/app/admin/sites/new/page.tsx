@@ -1,5 +1,7 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { createSite } from "../actions";
+import { Field } from "@/components/Field";
+import { Select } from "@/components/Select";
 
 export default async function NewSitePage() {
   const supabase = await createSupabaseServer();
@@ -7,6 +9,9 @@ export default async function NewSitePage() {
     supabase.from("customers").select("id, name").order("name"),
     supabase.from("contracts").select("id, code, customer_id").order("code")
   ]);
+
+  const customerOptions = (customers ?? []).map((c) => ({ value: c.id, label: c.name }));
+  const contractOptions = (contracts ?? []).map((c) => ({ value: c.id, label: c.code }));
 
   return (
     <main className="page-shell narrow">
@@ -20,32 +25,22 @@ export default async function NewSitePage() {
         "use server";
         await createSite(formData);
       }} className="form-card">
-        <label className="field">
-          <span>Cliente *</span>
-          <select name="customer_id" required>
-            <option value="">Selecione...</option>
-            {(customers ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          <span>Contrato (opcional)</span>
-          <select name="contract_id">
-            <option value="">Sem vínculo direto</option>
-            {(contracts ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          <span>Nome do site *</span>
-          <input name="name" required placeholder="Torre A" />
-        </label>
-        <label className="field">
-          <span>Endereço</span>
-          <input name="address" placeholder="Av. Paulista, 1000" />
-        </label>
-        <label className="field">
-          <span>Timezone</span>
-          <input name="timezone" defaultValue="America/Sao_Paulo" />
-        </label>
+        <Select
+          name="customer_id"
+          label="Cliente"
+          required
+          placeholder="Selecione..."
+          options={customerOptions}
+        />
+        <Select
+          name="contract_id"
+          label="Contrato (opcional)"
+          placeholder="Sem vínculo direto"
+          options={contractOptions}
+        />
+        <Field name="name" label="Nome do site" required placeholder="Torre A" />
+        <Field name="address" label="Endereço" placeholder="Av. Paulista, 1000" />
+        <Field name="timezone" label="Timezone" defaultValue="America/Sao_Paulo" />
         <div className="form-actions">
           <button type="submit" className="primary-button">Cadastrar site</button>
         </div>

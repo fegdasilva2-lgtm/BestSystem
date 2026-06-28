@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { EmptyState } from "./EmptyState";
 
 // ── Tipos ──
 
@@ -126,10 +127,10 @@ export function DataTable<T extends Record<string, unknown>>({
               <tr>
                 <td colSpan={columns.length}>
                   {emptyState ?? (
-                    <div className="table-empty">
-                      <p className="eyebrow">Nenhum registro encontrado</p>
-                      <p>Ajuste os filtros ou cadastre um novo registro.</p>
-                    </div>
+                    <EmptyState
+                      title="Nenhum registro encontrado"
+                      description="Ajuste os filtros da busca ou cadastre um novo registro."
+                    />
                   )}
                 </td>
               </tr>

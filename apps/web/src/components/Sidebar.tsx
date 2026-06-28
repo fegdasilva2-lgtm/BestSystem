@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { canAccess, type UserRole } from "@/lib/rbac-matrix";
+import { useFavorites } from "@/hooks/useFavorites";
 
 // ── Tipos ──
 
@@ -103,22 +105,23 @@ function UsersIcon() {
   );
 }
 
+function AuditIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <line x1="9" y1="13" x2="15" y2="13" />
+      <line x1="9" y1="17" x2="13" y2="17" />
+    </svg>
+  );
+}
+
 function ImportIcon() {
   return (
     <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />
       <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-  );
-}
-
-function InfoIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
     </svg>
   );
 }
@@ -148,6 +151,7 @@ const sections: SidebarSection[] = [
     label: "Admin",
     items: [
       { href: "/admin/users", label: "Acessos", icon: <UsersIcon /> },
+      { href: "/admin/audit", label: "Auditoria", icon: <AuditIcon /> },
       { href: "/admin/import", label: "Importação", icon: <ImportIcon /> },
     ],
   },
@@ -157,45 +161,155 @@ const sections: SidebarSection[] = [
 
 interface SidebarProps {
   collapsed: boolean;
-  role?: string;
+  mobileOpen?: boolean;
+  onNavigate?: () => void;
+  role?: UserRole;
 }
 
-export function Sidebar({ collapsed, role }: SidebarProps) {
+/**
+ * Sidebar filtra todos os itens usando canAccess() da matriz RBAC.
+ * Quando `role` nao e fornecido (sessao publica) a sidebar nao renderiza.
+ * Secoes que ficarem vazias apos o filtro sao omitidas para nao exibir
+ * cabecalhos orfaos.
+ *
+ * Em mobile (<900px via CSS) a sidebar vira drawer off-canvas controlado
+ * por `mobileOpen`. Cada clique em um link dispara `onNavigate` para o
+ * ClientShell fechar o drawer.
+ */
+export function Sidebar({ collapsed, mobileOpen, onNavigate, role }: SidebarProps) {
   const pathname = usePathname();
+  const { favorites, toggle, isFavorite, recordVisit, mounted } = useFavorites();
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
-    return pathname.startsWith(href);
+    return pathname.startsWith(href + "/") || pathname === href;
   };
 
-  const adminItems = [
-    ...sections[2].items,
-    ...(role === "super_admin_saas"
-      ? [{ href: "/admin/sobre", label: "Sobre", icon: <InfoIcon /> }]
-      : []),
-  ];
+  if (!role) return null;
+
+  // Filtra RBAC + injeta acao de favoritar nos itens
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .filter((item) => canAccess(role, item.href))
+        .map((item) => ({ ...item }))
+    }))
+    .filter((section) => section.items.length > 0);
+
+  // Constroi secao de Favoritos a partir do localStorage (soh items validos e com acesso)
+  const allItems = visibleSections.flatMap((s) => s.items);
+  const itemByHref = new Map(allItems.map((it) => [it.href, it]));
+  const favoriteItems = (mounted ? favorites : [])
+    .map((href) => itemByHref.get(href))
+    .filter((it): it is SidebarItem => Boolean(it));
+
+  // Auto-promove: registra visita em cada troca de rota (apos hidratacao)
+  useEffect(() => {
+    if (!mounted || !pathname) return;
+    if (!pathname.startsWith("/admin") && !pathname.startsWith("/portal")) return;
+    recordVisit(pathname);
+  }, [pathname, mounted, recordVisit]);
+
+  const className = [
+    "sidebar",
+    collapsed ? "collapsed" : "",
+    mobileOpen ? "mobile-open" : ""
+  ].filter(Boolean).join(" ");
 
   return (
     <nav
-      className={`sidebar${collapsed ? " collapsed" : ""}`}
+      className={className}
       aria-label="Navegação principal"
+      aria-hidden={mobileOpen === false ? undefined : !mobileOpen}
     >
-      {sections.map((section, si) => (
+      {favoriteItems.length > 0 && (
+        <div className="sidebar-favorites">
+          <div className="sidebar-section-label sidebar-favorites-label">
+            <StarIcon filled /> Favoritos
+          </div>
+          {favoriteItems.map((item) => (
+            <SidebarLink
+              key={item.href}
+              item={item}
+              active={isActive(item.href)}
+              onNavigate={onNavigate}
+              starred
+              onToggleStar={() => toggle(item.href)}
+            />
+          ))}
+        </div>
+      )}
+
+      {visibleSections.map((section) => (
         <div key={section.label}>
           <div className="sidebar-section-label">{section.label}</div>
-          {(si === 2 ? adminItems : section.items).map((item) => (
-            <Link
+          {section.items.map((item) => (
+            <SidebarLink
               key={item.href}
-              href={item.href}
-              className={`sidebar-item${isActive(item.href) ? " active" : ""}`}
-              aria-current={isActive(item.href) ? "page" : undefined}
-            >
-              {item.icon}
-              <span className="sidebar-item-label">{item.label}</span>
-            </Link>
+              item={item}
+              active={isActive(item.href)}
+              onNavigate={onNavigate}
+              starred={isFavorite(item.href)}
+              onToggleStar={() => toggle(item.href)}
+            />
           ))}
         </div>
       ))}
     </nav>
+  );
+}
+
+interface SidebarLinkProps {
+  item: SidebarItem;
+  active: boolean;
+  onNavigate?: () => void;
+  starred: boolean;
+  onToggleStar: () => void;
+}
+
+function SidebarLink({ item, active, onNavigate, starred, onToggleStar }: SidebarLinkProps) {
+  return (
+    <div className={`sidebar-item-wrap${active ? " active" : ""}${starred ? " starred" : ""}`}>
+      <Link
+        href={item.href}
+        className={`sidebar-item${active ? " active" : ""}`}
+        aria-current={active ? "page" : undefined}
+        onClick={onNavigate}
+      >
+        {item.icon}
+        <span className="sidebar-item-label">{item.label}</span>
+      </Link>
+      <button
+        type="button"
+        className="sidebar-star"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleStar();
+        }}
+        aria-label={starred ? `Remover ${item.label} dos favoritos` : `Adicionar ${item.label} aos favoritos`}
+        aria-pressed={starred}
+        title={starred ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+      >
+        <StarIcon filled={starred} />
+      </button>
+    </div>
+  );
+}
+
+function StarIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      width="14"
+      height="14"
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
   );
 }

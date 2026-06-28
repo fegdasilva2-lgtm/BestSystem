@@ -1,6 +1,7 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { EmptyState } from "@/components/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -75,14 +76,16 @@ export default async function AssetsListPage({
         {error ? (
           <p className="table-error">Erro ao carregar ativos: {error.message}</p>
         ) : !assets || assets.length === 0 ? (
-          <div className="table-empty">
-            <p className="eyebrow">Nenhum ativo encontrado</p>
-            <p>Cadastre o primeiro ativo ou use a importação em massa via CSV.</p>
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <a href="/admin/assets/new" className="button-link primary">+ Novo ativo</a>
-              <a href="/admin/import" className="button-link">Importar em massa</a>
-            </div>
-          </div>
+          <EmptyState
+            title="Nenhum ativo encontrado"
+            description="Cadastre o primeiro ativo ou use a importação em massa via CSV."
+            action={
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                <a href="/admin/assets/new" className="button-link primary">+ Novo ativo</a>
+                <a href="/admin/import" className="button-link">Importar em massa</a>
+              </div>
+            }
+          />
         ) : (
           <table className="data-table">
             <thead>

@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createMeasurement } from "../actions";
+import { Field } from "@/components/Field";
+import { Select } from "@/components/Select";
 
 export function NewMeasurementForm({ contracts }: { contracts: { id: string; code: string }[] }) {
   const router = useRouter();
@@ -29,25 +31,30 @@ export function NewMeasurementForm({ contracts }: { contracts: { id: string; cod
       {error && <p className="form-error" style={{ marginBottom: 12 }}>{error}</p>}
 
       <div className="form-grid two">
-        <label className="field">
-          <span>Contrato</span>
-          <select name="contract_id" required defaultValue="">
-            <option value="" disabled>Selecione...</option>
-            {contracts.map((c) => (
-              <option key={c.id} value={c.id}>{c.code}</option>
-            ))}
-          </select>
-        </label>
+        <Select
+          name="contract_id"
+          label="Contrato"
+          required
+          placeholder="Selecione..."
+          options={contracts.map((c) => ({ value: c.id, label: c.code }))}
+        />
 
-        <label className="field">
-          <span>Período (YYYY-MM)</span>
-          <input name="period" type="month" required defaultValue={currentPeriod} />
-        </label>
+        <Field
+          name="period"
+          label="Período (YYYY-MM)"
+          type="month"
+          required
+          defaultValue={currentPeriod}
+        />
 
-        <label className="field">
-          <span>Valor bruto (R$)</span>
-          <input name="gross_amount" type="number" min="0" step="0.01" defaultValue="0" />
-        </label>
+        <Field
+          name="gross_amount"
+          label="Valor bruto (R$)"
+          type="number"
+          min="0"
+          step="0.01"
+          defaultValue="0"
+        />
 
         <label className="field full">
           <span>Observações</span>
