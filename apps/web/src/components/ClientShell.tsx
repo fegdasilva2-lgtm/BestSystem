@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { BreadcrumbBar } from "./BreadcrumbBar";
 import { Sidebar } from "./Sidebar";
+import { ToastProvider } from "./Toast";
 import type { UserRole } from "@/lib/auth";
 
 type ClientShellProps = {
@@ -54,36 +55,38 @@ export function ClientShell({ logoutAction, user, children }: ClientShellProps) 
   }, [mobileOpen]);
 
   return (
-    <div className={`app-shell${collapsed ? " collapsed" : ""}`}>
-      <Header
-        logoutAction={logoutAction}
-        user={user}
-        collapsed={collapsed}
-        mobileOpen={mobileOpen}
-        onToggle={toggleCollapsed}
-        onMobileToggle={toggleMobile}
-      />
-
-      <Sidebar
-        collapsed={collapsed}
-        mobileOpen={mobileOpen}
-        onNavigate={closeMobile}
-        role={user?.role}
-      />
-
-      {mobileOpen && (
-        <button
-          type="button"
-          className="sidebar-overlay"
-          aria-label="Fechar menu"
-          onClick={closeMobile}
+    <ToastProvider>
+      <div className={`app-shell${collapsed ? " collapsed" : ""}`}>
+        <Header
+          logoutAction={logoutAction}
+          user={user}
+          collapsed={collapsed}
+          mobileOpen={mobileOpen}
+          onToggle={toggleCollapsed}
+          onMobileToggle={toggleMobile}
         />
-      )}
 
-      <div className="main-area">
-        <BreadcrumbBar />
-        {children}
+        <Sidebar
+          collapsed={collapsed}
+          mobileOpen={mobileOpen}
+          onNavigate={closeMobile}
+          role={user?.role}
+        />
+
+        {mobileOpen && (
+          <button
+            type="button"
+            className="sidebar-overlay"
+            aria-label="Fechar menu"
+            onClick={closeMobile}
+          />
+        )}
+
+        <div className="main-area">
+          <BreadcrumbBar />
+          {children}
+        </div>
       </div>
-    </div>
+    </ToastProvider>
   );
 }
