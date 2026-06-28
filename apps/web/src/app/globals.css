@@ -2425,10 +2425,15 @@ kbd {
 }
 
 .data-table td {
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-primary);
   vertical-align: middle;
+}
+
+/* Cabeçalho mais visualmente separado das linhas */
+.data-table thead {
+  background: var(--bg-panel);
 }
 
 .data-table tbody tr:last-child td {
@@ -2436,11 +2441,20 @@ kbd {
 }
 
 .data-table tbody tr {
-  transition: background 120ms ease;
+  transition: background 140ms ease, border-color 140ms ease;
+  border-left: 2px solid transparent;
 }
 
+/* Zebra stripes sutis — usa --bg-panel com opacidade para funcionar
+   tanto em light quanto dark mode sem nova cor */
+.data-table tbody tr:nth-child(even) {
+  background: var(--bg-panel);
+}
+
+/* Hover: combina zebra + accent border-left + leve shift */
 .data-table tbody tr:hover {
   background: var(--bg-hover);
+  border-left-color: var(--accent);
 }
 
 .table-link {
