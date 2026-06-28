@@ -148,6 +148,8 @@ const sections: SidebarSection[] = [
 
 interface SidebarProps {
   collapsed: boolean;
+  mobileOpen?: boolean;
+  onNavigate?: () => void;
   role?: UserRole;
 }
 
@@ -156,8 +158,12 @@ interface SidebarProps {
  * Quando `role` nao e fornecido (sessao publica) a sidebar nao renderiza.
  * Secoes que ficarem vazias apos o filtro sao omitidas para nao exibir
  * cabecalhos orfaos.
+ *
+ * Em mobile (<900px via CSS) a sidebar vira drawer off-canvas controlado
+ * por `mobileOpen`. Cada clique em um link dispara `onNavigate` para o
+ * ClientShell fechar o drawer.
  */
-export function Sidebar({ collapsed, role }: SidebarProps) {
+export function Sidebar({ collapsed, mobileOpen, onNavigate, role }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
@@ -174,10 +180,17 @@ export function Sidebar({ collapsed, role }: SidebarProps) {
     }))
     .filter((section) => section.items.length > 0);
 
+  const className = [
+    "sidebar",
+    collapsed ? "collapsed" : "",
+    mobileOpen ? "mobile-open" : ""
+  ].filter(Boolean).join(" ");
+
   return (
     <nav
-      className={`sidebar${collapsed ? " collapsed" : ""}`}
+      className={className}
       aria-label="Navegação principal"
+      aria-hidden={mobileOpen === false ? undefined : !mobileOpen}
     >
       {visibleSections.map((section) => (
         <div key={section.label}>
@@ -188,6 +201,7 @@ export function Sidebar({ collapsed, role }: SidebarProps) {
               href={item.href}
               className={`sidebar-item${isActive(item.href) ? " active" : ""}`}
               aria-current={isActive(item.href) ? "page" : undefined}
+              onClick={onNavigate}
             >
               {item.icon}
               <span className="sidebar-item-label">{item.label}</span>

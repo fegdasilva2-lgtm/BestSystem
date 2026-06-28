@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { BreadcrumbBar } from "./BreadcrumbBar";
 import { Sidebar } from "./Sidebar";
@@ -18,13 +19,39 @@ type ClientShellProps = {
 };
 
 /**
- * Shell cliente que gerencia o estado de colapso da sidebar e
- * renderiza o layout com grid: sidebar + (header full-width + breadcrumb + conteúdo).
- * O Header fica em sticky no topo, ocupando toda a largura (grid-column: 1 / -1).
+ * Shell cliente que gerencia o estado de colapso da sidebar e o drawer
+ * mobile. Renderiza o layout com grid: sidebar + (header full-width +
+ * breadcrumb + conteudo). O Header fica sticky no topo, ocupando toda a
+ * largura (grid-column: 1 / -1).
+ *
+ * Responsividade:
+ *  - desktop (>=900px): sidebar colapsa/expande normalmente
+ *  - mobile (<900px): sidebar vira drawer off-canvas controlado por
+ *    `mobileOpen`; ao trocar de rota, drawer fecha automaticamente
  */
 export function ClientShell({ logoutAction, user, children }: ClientShellProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const toggle = useCallback(() => setCollapsed((c) => !c), []);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
+  const toggleMobile = useCallback(() => setMobileOpen((o) => !o), []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+
+  // Fecha drawer ao trocar de rota (UX esperada em mobile)
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Trava scroll do body quando drawer esta aberto
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [mobileOpen]);
 
   return (
     <div className={`app-shell${collapsed ? " collapsed" : ""}`}>
@@ -32,10 +59,26 @@ export function ClientShell({ logoutAction, user, children }: ClientShellProps) 
         logoutAction={logoutAction}
         user={user}
         collapsed={collapsed}
-        onToggle={toggle}
+        mobileOpen={mobileOpen}
+        onToggle={toggleCollapsed}
+        onMobileToggle={toggleMobile}
       />
 
-      <Sidebar collapsed={collapsed} role={user?.role} />
+      <Sidebar
+        collapsed={collapsed}
+        mobileOpen={mobileOpen}
+        onNavigate={closeMobile}
+        role={user?.role}
+      />
+
+      {mobileOpen && (
+        <button
+          type="button"
+          className="sidebar-overlay"
+          aria-label="Fechar menu"
+          onClick={closeMobile}
+        />
+      )}
 
       <div className="main-area">
         <BreadcrumbBar />
