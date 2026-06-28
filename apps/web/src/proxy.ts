@@ -64,15 +64,34 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. Revogacao defensiva: usuario desativado em users_profile e bloqueado
-  //    mesmo com JWT ainda valido.
+  //    mesmo com JWT ainda valido. Tambem checa sessions_invalidated_at para
+  //    detectar mudanca de role/active apos emissao do JWT (claim stale).
   const { data: profile } = await supabase
     .from("users_profile")
-    .select("active, role")
+    .select("active, role, sessions_invalidated_at")
     .eq("id", user.id)
     .maybeSingle();
 
   if (!profile?.active) {
     loginUrl.searchParams.set("error", "Sessão expirada ou usuário desativado.");
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    for (const cookie of request.cookies.getAll()) {
+      if (cookie.name.startsWith("sb-")) {
+        redirectResponse.cookies.set(cookie.name, "", { maxAge: 0, path: "/" });
+      }
+    }
+    return redirectResponse;
+  }
+
+  // JWT staleness: se sessions_invalidated_at > iat, o token atual
+  // carrega claims antigos (role/active desatualizados). Forca re-login.
+  const jwtIat = (user as { iat?: number }).iat;
+  if (
+    profile.sessions_invalidated_at &&
+    typeof jwtIat === "number" &&
+    new Date(profile.sessions_invalidated_at).getTime() > jwtIat * 1000
+  ) {
+    loginUrl.searchParams.set("error", "Sua sessão foi invalidada. Faça login novamente.");
     const redirectResponse = NextResponse.redirect(loginUrl);
     for (const cookie of request.cookies.getAll()) {
       if (cookie.name.startsWith("sb-")) {
