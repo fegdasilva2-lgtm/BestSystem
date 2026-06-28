@@ -26,6 +26,12 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@predialops/ds"],
   typedRoutes: false,
+  experimental: {
+    // Habilita View Transitions API para toda navegação via <Link>.
+    // Browser faz fallback gracioso em navegadores sem suporte (Firefox < 144).
+    // CSS recipes em apps/web/src/app/globals.css (secao "View Transitions").
+    viewTransition: true,
+  },
   async headers() {
     return [
       {

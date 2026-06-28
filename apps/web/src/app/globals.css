@@ -2976,3 +2976,90 @@ kbd {
   .animate-fade-in,
   .animate-slide-in-right { animation: none; }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   View Transitions API (item B2 da Trilha B)
+   Habilitado em next.config.mjs via experimental.viewTransition: true.
+   Toda navegação via <Link> é interceptada pelo Next e envolvida em
+   document.startViewTransition. As pseudo-elements abaixo definem
+   as animações. Suporte: Chromium 111+, Safari 18.2+, Firefox 144+.
+   Em browsers sem suporte, navegador faz navegação normal sem anim.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Timing variables (compartilhadas com .toast e .interactive-lift) */
+:root {
+  --duration-vt-exit: 140ms;
+  --duration-vt-enter: 200ms;
+  --duration-vt-move: 360ms;
+}
+
+/* Default cross-fade entre paginas (Next aplica default="auto" por padrao) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-vt-enter);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Directional navigation (nav-forward / nav-back) — uso via
+   addTransitionType() em handlers client-side quando quiser deslizar
+   horizontalmente. Padrao atual e cross-fade simples acima. */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -24px;
+  animation:
+    var(--duration-vt-exit) ease-in both vt-fade-out,
+    var(--duration-vt-move) ease-in-out both vt-slide-reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 24px;
+  animation:
+    var(--duration-vt-enter) cubic-bezier(0.22, 1, 0.36, 1) var(--duration-vt-exit) both vt-fade-in,
+    var(--duration-vt-move) ease-in-out both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 24px;
+  animation:
+    var(--duration-vt-exit) ease-in both vt-fade-out,
+    var(--duration-vt-move) ease-in-out both vt-slide-reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -24px;
+  animation:
+    var(--duration-vt-enter) cubic-bezier(0.22, 1, 0.36, 1) var(--duration-vt-exit) both vt-fade-in,
+    var(--duration-vt-move) ease-in-out both vt-slide;
+}
+@keyframes vt-slide {
+  from { translate: var(--slide-offset); }
+  to   { translate: 0; }
+}
+@keyframes vt-slide-reverse {
+  from { translate: 0; }
+  to   { translate: var(--slide-offset); }
+}
+
+/* Reduced motion: desativa todas as animacoes de View Transition
+   (browser ainda faz o cross-fade padrao do UA, mas customizamos aqui) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(.nav-forward),
+  ::view-transition-new(.nav-forward),
+  ::view-transition-old(.nav-back),
+  ::view-transition-new(.nav-back) {
+    animation: none;
+  }
+}
