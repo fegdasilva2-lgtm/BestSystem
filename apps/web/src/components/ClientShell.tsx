@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { BreadcrumbBar } from "./BreadcrumbBar";
 import { Sidebar } from "./Sidebar";
 import { ToastProvider } from "./Toast";
+import { CommandPalette } from "./CommandPalette";
 import type { UserRole } from "@/lib/auth";
 
 type ClientShellProps = {
@@ -87,6 +88,7 @@ export function ClientShell({ logoutAction, user, children }: ClientShellProps) 
           {children}
         </div>
       </div>
+      <CommandPalette role={user?.role} />
     </ToastProvider>
   );
 }
