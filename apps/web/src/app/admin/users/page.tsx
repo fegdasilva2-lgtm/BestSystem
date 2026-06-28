@@ -5,6 +5,7 @@ import { canManageUsers } from "@/lib/rbac-matrix";
 import { ForceLogoutButton } from "@/components/ForceLogoutButton";
 import { Field } from "@/components/Field";
 import { Select } from "@/components/Select";
+import { Badge } from "@/components/Badge";
 import { forceLogout } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
 
@@ -80,7 +81,9 @@ export default async function UsersPage({
             <div>
               <h2>{profile.name}</h2>
               <p className="muted">{profile.email}</p>
-              <span className="role-tag">{roleLabels[profile.role]}</span>
+              <span>
+              <Badge label={roleLabels[profile.role]} variant="neutral" />
+            </span>
             </div>
           </div>
           <div className="profile-list">
@@ -117,11 +120,9 @@ export default async function UsersPage({
                 <span className="user-id">
                   <strong>{user.name}</strong>
                   <small className="muted">{user.email}</small>
-                  <span className="role-tag">{roleLabels[user.role as UserRole] ?? user.role}</span>
+                  <Badge label={roleLabels[user.role as UserRole] ?? user.role} variant="neutral" />
                 </span>
-                <span className={`status-pill ${user.active ? "" : "danger-pill"}`}>
-                  {user.active ? "ativo" : "inativo"}
-                </span>
+                <Badge label={user.active ? "ativo" : "inativo"} variant={user.active ? "ok" : "danger"} />
                 {canManageUsers(profile.role) && user.id !== profile.authUserId ? (
                   <ForceLogoutButton
                     action={forceLogoutAction}

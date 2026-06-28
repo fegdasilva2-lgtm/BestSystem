@@ -3,6 +3,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { getSessionProfile } from "@/lib/auth";
 import { DataTable, type DataTableColumn } from "@/components/DataTable";
 import { EmptyState } from "@/components/EmptyState";
+import { Badge } from "@/components/Badge";
 
 export const dynamic = "force-dynamic";
 
@@ -102,7 +103,7 @@ export default async function AuditPage({ searchParams }: PageProps) {
       label: "Ação",
       sortable: true,
       render: (_, v) => (
-        <span className="role-tag">{ACTION_LABELS[String(v ?? "")] ?? String(v ?? "—")}</span>
+        <Badge label={ACTION_LABELS[String(v ?? "")] ?? String(v ?? "—")} variant="neutral" />
       )
     },
     {

@@ -6,6 +6,7 @@ import { canAccessContract } from "@/lib/contract-access";
 import { DataTable, type DataTableColumn } from "@/components/DataTable";
 import { getStatusBadgeClass, formatStatusLabel } from "@/lib/status-badges";
 import { EmptyState } from "@/components/EmptyState";
+import { Badge } from "@/components/Badge";
 
 export const dynamic = "force-dynamic";
 
@@ -381,10 +382,11 @@ export default async function ContractDetailPage({ params }: PageProps) {
                     <strong>{u.name}</strong>
                     <small className="muted">{u.email}</small>
                   </span>
-                  <span className="role-tag">{u.role}</span>
-                  <span className={`status-pill ${u.active ? "" : "danger-pill"}`}>
-                    {u.active ? "ativo" : "inativo"}
-                  </span>
+                  <Badge label={u.role} variant="neutral" />
+                  <Badge
+                    label={u.active ? "ativo" : "inativo"}
+                    variant={u.active ? "ok" : "danger"}
+                  />
                 </div>
               );
             })}
