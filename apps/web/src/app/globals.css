@@ -563,6 +563,85 @@ kbd {
   padding: 10px;
 }
 
+/* ── Sidebar: item com botao de favoritar + secao de Favoritos ── */
+.sidebar-item-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  transition: background 160ms ease;
+}
+.sidebar-item-wrap:hover {
+  background: var(--bg-hover);
+}
+.sidebar-item-wrap.active {
+  background: var(--bg-active);
+}
+
+.sidebar-item-wrap .sidebar-item {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+}
+
+.sidebar-star {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 140ms ease, background 140ms ease, color 140ms ease;
+  margin-right: 6px;
+}
+.sidebar-item-wrap:hover .sidebar-star,
+.sidebar-item-wrap.starred .sidebar-star {
+  opacity: 1;
+}
+.sidebar-item-wrap.starred .sidebar-star {
+  color: var(--accent-deep);
+}
+.sidebar-star:hover {
+  background: var(--bg-panel-strong);
+  color: var(--accent);
+}
+.sidebar-item-wrap.starred .sidebar-star:hover {
+  color: var(--accent-deep);
+}
+
+/* Em mobile drawer, mantem a estrela visivel (touch nao tem hover) */
+@media (max-width: 900px) {
+  .sidebar-star {
+    opacity: 1;
+  }
+}
+
+/* Quando colapsada, esconde o botao de favoritar (nao cabe) */
+.collapsed .sidebar-star {
+  display: none;
+}
+
+.sidebar-favorites {
+  margin-bottom: 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.sidebar-favorites-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-deep);
+}
+.sidebar-favorites-label svg {
+  width: 11px;
+  height: 11px;
+}
+
 /* ── Área principal (substitui .app-chrome) ── */
 .main-area {
   padding: 0 28px 56px;
